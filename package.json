@@ -1,0 +1,41 @@
+{
+  "name": "distributionApp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "antd-mobile": "2.1.0",
+    "area-data": "^5.0.6",
+    "axios": "^0.18.0",
+    "babel-plugin-import": "^1.6.2",
+    "jcore-react-native": "^1.2.6",
+    "jpush-react-native": "^2.2.5",
+    "moment": "^2.22.1",
+    "react": "^16.3.1",
+    "react-dom": "^16.3.2",
+    "react-native": "0.55.4",
+    "react-native-code-push": "^5.3.5",
+    "react-native-fs": "^2.10.14",
+    "react-native-image-picker": "^0.26.10",
+    "react-native-iphone-x-helper": "^1.2.0",
+    "react-native-linear-gradient": "^2.5.3",
+    "react-native-storage": "^0.2.2",
+    "react-navigation": "^2.0.1"
+  },
+  "devDependencies": {
+    "babel-jest": "22.4.3",
+    "babel-plugin-import": "1.6.1",
+    "babel-preset-react-native": "^1.0.0",
+    "jest": "22.4.3",
+    "react-redux": "^5.0.7",
+    "react-test-renderer": "16.3.1",
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.3.0"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}

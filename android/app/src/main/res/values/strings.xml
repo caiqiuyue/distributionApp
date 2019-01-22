@@ -1,0 +1,4 @@
+<resources>
+    <string moduleConfig="true" name="reactNativeCodePush_androidDeploymentKey">DQBnEDf7W44ZrPOsqRuwli8RalRf4ksvOXqog</string>
+    <string name="app_name">乾亨运动</string>
+</resources>
