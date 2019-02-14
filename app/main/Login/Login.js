@@ -214,11 +214,19 @@ export default class Login extends Component {
 
                     } else {
 
+                        if(global.realname!=phone){
+                            storage.remove({
+                                key: 'goodsDatas'
+                            });
+                        }
+
                         let data = response.data.data;
 
                         let TOKEN = {
                             TOKEN:response.data.data.TOKEN
                         };
+
+
 
                         let username = data;
                         username.paySmsCodeFlag = false;

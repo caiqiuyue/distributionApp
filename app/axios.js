@@ -3,6 +3,7 @@ import ajax from 'axios';
 //请求域名头
 const urlTitle = 'https://39.105.201.251/distributor';
 
+
 const clientApi = (type, url, data, resolve, reject) => {
     //console.log(global);
     //首先判断global里面有没有TOKEN
@@ -19,13 +20,7 @@ const clientApi = (type, url, data, resolve, reject) => {
             }
         };
 
-        console.log(data,'datadatadatadata');
-        console.log(data instanceof FormData,'data instanceof FormData');
-
-
         if (data instanceof FormData) {
-
-
             config.headers = {
                 'Content-Type': 'multipart/form-data',
                 ...config.headers,
@@ -54,6 +49,7 @@ const clientApi = (type, url, data, resolve, reject) => {
                     global.TOKEN='';
                     global.roleStr = null;
                     global.getNavigate('Login',{ user: '' })
+                    global.stopMsgTime && clearInterval(global.stopMsgTime);
                 } else {
                     resolve(response);
                 }
@@ -107,7 +103,7 @@ const clientApi = (type, url, data, resolve, reject) => {
                         storage.remove({
                             key: 'username'
                         });
-                        clearInterval(global.stopMsgTime);
+                        global.stopMsgTime && clearInterval(global.stopMsgTime);
                         global.TOKEN='';
                         global.roleStr = null;
                         global.getNavigate('Login',{ user: '' })
@@ -164,6 +160,7 @@ const clientApi = (type, url, data, resolve, reject) => {
                         global.TOKEN='';
                         global.roleStr = null;
                         global.getNavigate('Login',{ user: '' })
+                        global.stopMsgTime && clearInterval(global.stopMsgTime);
                     } else {
                         resolve(response);
                     }

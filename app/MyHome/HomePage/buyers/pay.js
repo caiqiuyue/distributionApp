@@ -6,7 +6,7 @@ import {
     StyleSheet,
     TouchableHighlight,
     View,Dimensions,
-    FlatList,Modal,ScrollView,Image,
+    DeviceEventEmitter,Modal,ScrollView,Image,
     Platform
 
 } from 'react-native';
@@ -216,7 +216,8 @@ export default class App extends React.Component {
         };
 
 
-        this.parentId = null
+        this.parentId = null;
+        this.templateObj = {};
 
     }
 
@@ -244,112 +245,130 @@ export default class App extends React.Component {
 
 
     componentWillMount() {
-
-
         storage.load({ //读取tokenKey
             key: 'username',
             autoSync: false
         }).then(ret => {
                 console.log(ret);
-                this.setState({
-                    paySmsCodeFlag:ret.paySmsCodeFlag
-                })
-
+                this.userName = ret.realname;
+                // this.setState({
+                //     paySmsCodeFlag:ret.paySmsCodeFlag
+                // })
             }
-        ).catch(
-            (error) => {
-                reject(error);
-            })
+        ).catch(error => {
+            reject(error);
+        });
 
         const {getParam} = this.props.navigation;
         const datas = getParam("user");
-        
+        this.type = getParam("type");
 
         // let datas = {"sendFlag":0,"marketPrice":969,"matchFlag":0,"color":"白色","goodsId":88,"goodsRate":1,"type":"鞋子","feedbackFlag":0,"closureTime":"","feedbackTime":1,"sellerId":3,"season":"spring","goodsTime":2,"stock":0,"goodsName":null,"channelId":33,"goodsNo":"554724-104","delivery":"0","models":[{"modelName":"7","modelId":243,"stockNum":1,"salesNum":null,"stockNo":1},{"modelName":"8","modelId":244,"stockNum":1,"salesNum":null,"stockNo":1},{"modelName":"9","modelId":245,"stockNum":0,"salesNum":1,"stockNo":0}],"saleRate":1,"brandName":"NIKE","salePrice":1.01,"sex":1,"sendTime":1,"series":"AJ1","channelName":"北方大仓","channelDesc":"123","category":"篮球鞋","marketTime":""}
 
-
-        datas.models = datas.models.filter(item => {return item.stockNo>0})
-
-        let a = [];
-        let val = [];
-        let templateList = [];
-
-        axios.get(`/goods/getPostTemplateByChannelId`,
-            {
-                channelId:datas.channelId
+        let num = 0;
+        const channelObj = {};
+        datas.map(item => {
+            item.models = item.models.filter(item => {return item.stockNo>0});
+            if(!this.templateObj[item.channelId]) {
+                this.templateObj[item.channelId] = [];
+                channelObj[num] = item.channelId;
+                num ++;
             }
-
-        )
-            .then((response) =>{
-                console.log(response,'查询快递模版');
-
-
-                if(response.data.code==0){
-
-                    templateList = response.data.data
-
-                    templateList.map(item=>{
-                        let b = {
-                            label:item.post_name,
-                            value:item.post_id,
-                        }
-                        a.push(b)
-                    })
+        });
+        console.log(datas,'datasdatasdatas');
+        console.log(this.type,'datasdatasdatas');
 
 
-                    templateList.map(item=>{
-                        if(item.isDefault===1){
-                            val[0] = item.post_id;
-                        }else {
-                            val[0] = a[0].value;
-                        }
-                    })
-
-
+        let index = 0, goodsList = [], totalMoney = 0;
+        const setData = (_item) => {
+            let a = [];
+            let val = [];
+            let templateList = [];
+            let dataArr = datas.filter(item => item.channelId == _item);
+            axios.get(`/goods/getPostTemplateByChannelId`,
+                {
+                    channelId: _item
                 }
+            )
+                .then((response) =>{
+                    console.log(response,'查询快递模版');
+                    if(response.data.code==0){
 
-                datas.models.map(item=>{
-                    item.templateList = a
-                    item.templateListValue = val
-                    item.postId = val[0]
-                    item.postFee = 0
-                    item.postName = item.templateList.filter(_item=>_item.value==val[0])[0].label
-                    item.goodsAmount = (item.postFee-0)+(datas.salePrice-0)*item.stockNo
+                        templateList = response.data.data;
 
+                        templateList.map(item=>{
+                            let b = {
+                                label:item.post_name,
+                                value:item.post_id,
+                            };
+                            a.push(b)
+                        });
+
+
+                        templateList.map(item=>{
+                            if(item.isDefault===1){
+                                val[0] = item.post_id;
+                            }else {
+                                val[0] = a[0].value;
+                            }
+                        })
+
+
+                    }
+
+                    this.templateObj[_item] = a;
+                    dataArr.map(_val => {
+                        console.log(_val)
+                        _val.models.map(item=>{
+                            item.templateList = a;
+                            item.templateListValue = val;
+                            item.postId = val[0];
+                            item.postFee = 0;
+                            item.postName = item.templateList.filter(_item=>_item.value==val[0])[0].label;
+                            item.goodsAmount = (item.postFee-0)+(_val.salePrice-0)*item.stockNo;
+                        });
+                        _val.models.map(item=>{
+                            totalMoney += item.goodsAmount * 1
+                        });
+                    });
+
+                    index ++;
+                    goodsList = goodsList.concat(dataArr);
+                    if(channelObj[index]) {
+                        setData(channelObj[index]);
+                    } else {
+                        console.log(goodsList);
+                        this.setState({
+                            goodsList,
+                            totalMoney
+                        })
+                    }
                 })
-
-
-                let totalMoney = 0
-                datas.models.map(item=>{
-                    totalMoney += item.goodsAmount
+                .catch((error)=> {
+                    console.log(error);
+                    dataArr.map(_val => {
+                        _val.models.map(item=>{
+                            item.templateList = a;
+                            item.templateListValue = val;
+                        });
+                        goodsList.push(_val);
+                        if(channelObj[index]) {
+                            setData(channelObj[index]);
+                        } else {
+                            this.setState({
+                                goodsList:goodsList,
+                                totalMoney
+                            })
+                        }
+                    });
                 })
-
-                this.setState({
-                    goodsList:datas,
-                    templateList,
-                    templateListValue:val[0],
-                    totalMoney
-
-                })
-
-
-            })
-            .catch((error)=> {
-                console.log(error);
-                datas.models.map(item=>{
-                    item.templateList = a
-                    item.templateListValue = val
-                })
-                this.setState({
-                    goodsList:datas,
-                    templateList
-
-                })
-            })
-
-
+        };
+        setData(channelObj[index]);
     }
 
+    componentWillUnmount(){
+        DeviceEventEmitter.emit('Pay','Pay');
+    }
 
     //快递状态修改
     setpostFlag = (item)=>{
@@ -359,12 +378,23 @@ export default class App extends React.Component {
     }
 
 
+    aa = () => {
+        this.setState({ modalVisible: false },()=>{
+            Toast.info('支付成功');
+            console.log(this.state.modalVisible,'modalVisiblemodalVisible');
+            const { navigate } = this.props.navigation;
+            navigate('GoodSelect',{ user: '' })
+        });
+
+
+    };
+
+
     //快递名称修改
     changePost = (ite,iit) => {
-        let {goodsList,templateList,province} = this.state
-        
-        let val = ite
-        val[0] = val[0]-0
+        let {goodsList,province} = this.state;
+        let val = ite;
+        val[0] = val[0]-0;
 
 
         if(!province[0]){
@@ -373,51 +403,57 @@ export default class App extends React.Component {
         }
 
 
-        axios.get(`/goods/getChannelPostFeeByProvince`,{
-            channelId:goodsList.channelId,
-            postId:val[0],
-            province:province[0]?this.state.provinceList.filter(_item=>_item.value==province[0])[0].label:'',
-        },)
-            .then((response) =>{
-                console.log(response);
-                if(response.data.code==0){
+        let index = 0;
+        let totalMoney = 0, goodsArr =[];
+        let setData = (_item) => {
+            let templateList = this.templateObj[_item.channelId];
+            console.log(templateList);
+            axios.get(`/goods/getChannelPostFeeByProvince`,{
+                channelId:_item.channelId,
+                postId:val[0],
+                province:province[0]?this.state.provinceList.filter(_item=>_item.value==province[0])[0].label:'',
+            },)
+                .then((response) =>{
+                    console.log(response);
+                    if(response.data.code==0){
 
-                    goodsList.models.map(item=>{
+                        _item.models.map(item=>{
+                            if(iit.modelId==item.modelId){
+                                item.templateListValue = val
+                                item.postId = val[0]
+                                item.postFee = response.data.data.postFee
+                                item.postName = templateList.filter(item=>item.value==val[0])[0].label
+                                item.goodsAmount = (item.postFee-0)+(_item.salePrice-0)*item.stockNo
 
-                        if(iit.modelId==item.modelId){
-                            item.templateListValue = val
-                            item.postId = val[0]
-                            item.postFee = response.data.data.postFee
-                            item.postName = templateList.filter(_item=>_item.value==val[0])[0].label
-                            item.goodsAmount = (item.postFee-0)+(goodsList.salePrice-0)*item.stockNo
+                            }
 
+
+                        });
+
+                        _item.models.map(item=>{
+                            totalMoney += item.goodsAmount
+                        });
+
+                        index ++;
+                        goodsArr.push(_item);
+                        if(goodsList[index]) {
+                            setData(goodsList[index]);
+                        } else {
+                            this.setState({
+                                goodsList:goodsArr,
+                                totalMoney
+                            })
                         }
-
-
-                    })
-
-
-                    let totalMoney = 0
-                    goodsList.models.map(item=>{
-                        totalMoney += item.goodsAmount
-                    })
-
-                    this.setState({
-                        goodsList,
-                        totalMoney
-
-                    })
-
-                }else {
-                    Toast.info(response.data.message)
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-
-
-    }
+                    }else {
+                        Toast.info(response.data.message)
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                })
+        };
+        setData(goodsList[index]);
+    };
 
 
     //智能解析地址框
@@ -500,8 +536,12 @@ export default class App extends React.Component {
     //提交并准备支付
     submitPay = ()=>{
 
-        let {provinceVal,cityVal,regionVal,remark,postFlag,custOrderNo,totalMoney,province,city,region,address,name,phoneNo} = this.state;
 
+
+        let {goodsList, provinceVal,cityVal,regionVal,remark,postFlag,custOrderNo,totalMoney,province,city,region,address,name,phoneNo} = this.state;
+
+        console.log(goodsList,'goodsListgoodsListgoodsList');
+        
         if(!name){
             Toast.info('请输入收货人姓名',1);
             return
@@ -551,23 +591,24 @@ export default class App extends React.Component {
 
 
 
-        this.state.goodsList.models.map(item=>{
-            let a = {}
-            a.postId = item.postId
-            a.postFee = item.postFee
-            a.postName = item.postName
-            a.modelId = item.modelId
-            a.goodsNum = item.stockNo
-            a.goodsPrice = (this.state.goodsList.salePrice-0)
-            a.goodsAmount = (this.state.goodsList.salePrice-0)+(item.postFee-0)
-            a.channelId = this.state.goodsList.channelId
-            a.goodsId = this.state.goodsList.goodsId
-            a.goodsNo = this.state.goodsList.goodsNo
-            a.sellerId = this.state.goodsList.sellerId
-            data.goodsList.push(a)
-        }
+        goodsList.map(_item => {
+            _item.models.map(item=>{
+                let a = {}
+                a.postId = item.postId
+                a.postFee = item.postFee
+                a.postName = item.postName
+                a.modelId = item.modelId
+                a.goodsNum = item.stockNo
+                a.goodsPrice = (_item.salePrice-0)
+                a.goodsAmount = (_item.salePrice-0)+(item.postFee-0)
+                a.channelId = _item.channelId
+                a.goodsId = _item.goodsId
+                a.goodsNo = _item.goodsNo
+                a.sellerId = _item.sellerId
+                data.goodsList.push(a)
+            });
+        });
 
-        )
 
         axios.post(`/order/orderCommit`,data,)
             .then((res) =>{
@@ -582,6 +623,27 @@ export default class App extends React.Component {
                         .then((response) =>{
                             console.log(response);
                             if(response.data.code==0){
+
+                                if(this.type) {
+                                    // 读取
+                                    storage.load({
+                                        key: 'goodsDatas',
+                                        autoSync: false
+                                    }).then(res => {
+                                        console.log(res);
+                                        let goodsData = res;
+                                        goodsData[this.userName] = [];
+                                        storage.save({
+                                            key: 'goodsDatas',
+                                            data: goodsData,
+                                            expires: null
+                                        });
+
+                                    }).catch(err => {
+                                        console.log(err);
+                                    });
+                                }
+
 
                                 this.setState({
                                     modalVisible:true,
@@ -609,94 +671,66 @@ export default class App extends React.Component {
 
     //选择省且得到邮费
     setProvince = (province)=>{
+        let {goodsList, provinceList} = this.state;
 
-        let {goodsList,templateListValue} = this.state;
+        let index = 0, goodsArr = [], totalMoney = 0;
+        const setData = (_item) => {
+            let models = _item.models;
+            let _index = 0, _models = [];
 
-        axios.get(`/goods/getChannelPostFeeByProvince`,{
-            channelId:goodsList.channelId,
-            postId:templateListValue,
-            province:this.state.provinceList.filter(_item=>_item.value==province[0])[0].label,
-        },)
-            .then((response) =>{
-                console.log(response);
-                if(response.data.code==0){
+            const setModels = (val) => {
+                axios.get(`/goods/getChannelPostFeeByProvince`,{
+                    channelId:_item.channelId,
+                    postId:val.templateListValue[0],
+                    province:provinceList.filter(_item=>_item.value==province[0])[0].label,
+                })
+                    .then((response) =>{
+                        console.log(response);
+                        if(response.data.code==0){
+                            val.postFee = response.data.data.postFee
+                            val.goodsAmount = (val.postFee-0)+(_item.salePrice-0)*val.stockNo
+                            console.log(val, _item);
+                            _models.push(val);
+                            totalMoney += val.goodsAmount
 
-                    goodsList.models.map(item=>{
-                        item.postFee = response.data.data.postFee
-                        item.goodsAmount = (item.postFee-0)+(goodsList.salePrice-0)*item.stockNo
+                            _index ++;
+                            if(models[_index]) {
+                                setModels(models[_index]);
+                            } else {
+                                index ++;
+                                _item.models = _models;
+                                goodsArr.push(_item);
 
+                                if(!goodsList[index]) {
+                                    this.setState({
+                                        goodsList: goodsArr,
+                                        totalMoney
+                                    })
+                                } else {
+                                    setData(goodsList[index]);
+                                }
+                            }
+                        }else {
+                            alert(response.data.message)
+                        }
                     })
-
-
-                    let totalMoney = 0
-                    goodsList.models.map(item=>{
-                        totalMoney += item.goodsAmount
+                    .catch(function (error) {
+                        console.log(error);
                     })
+            };
+            setModels(models[_index]);
 
-                    this.setState({
-                        goodsList,
-                        totalMoney
+        };
+        setData(goodsList[index]);
 
-                    })
-
-                }else {
-                    alert(response.data.message)
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
 
 
         this.setState({
             province,
             cityList:setValues(pcaa[province[0]]),
             provinceVal:province[0]&&this.state.provinceList.filter(_item=>_item.value==province[0])[0].label
-        })
+        });
     }
-
-
-
-    topUp = ()=>{
-        const { navigate } = this.props.navigation;
-        navigate('TopUp',{ user: '' });
-    }
-
-
-
-
-    //支付
-    onPay = ()=>{
-        let {payPassword,totalMoney} = this.state
-        if(!payPassword){
-            alert('请输入支付密码')
-            return
-        }
-
-        axios.post(`/order/orderPay`,{
-            parentId:this.parentId,
-            payMoney:totalMoney,
-            password:payPassword,
-        },)
-            .then((res) =>{
-                console.log(res);
-                if(res.data.code==0){
-
-
-                }else {
-                    alert(res.data.message)
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-
-
-
-    }
-
-
-
 
 
     render() {
@@ -875,7 +909,7 @@ export default class App extends React.Component {
                                                         </TouchableHighlight>
                                                     </View>
 
-                                                </View>:<PayComponents payDatas={this.state.payDatas} parentId={this.parentId}/>}
+                                                </View>:<PayComponents aa={()=>{this.aa()}} payDatas={this.state.payDatas} parentId={this.parentId}/>}
 
                                             </ScrollView>
                                         </View>
@@ -953,58 +987,60 @@ export default class App extends React.Component {
 
 
                         {
-                            goodsList.models && goodsList.models.map((item,index)=>
+                            goodsList && goodsList.map(_item => {
+                                return _item.models && _item.models.map((item,index)=>
 
 
-                                item.stockNo > 0 &&
+                                    item.stockNo > 0 &&
 
-                                <View key={index} style={{borderColor:"#f0f0f0",borderTopWidth:5,padding:10}}>
-                                    <View style={{padding:10}}>
-                                        <View>
-                                            <Text style={{fontWeight:"bold"}}>{`${goodsList.brandName} ${goodsList.goodsNo} ${goodsList.channelName}`}</Text>
-                                            <View style={{flexDirection:"row",marginTop:10,justifyContent:"space-between"}}>
-                                                <View style={styles.qw}><Text>{item.modelName}码</Text></View>
-                                                <View style={styles.qw}><Text><Text style={{color:"grey"}}>数量</Text>*{item.stockNo}</Text></View>
-                                                <View style={styles.qw}><Text><Text style={{color:"grey"}}>单价:</Text>{goodsList.salePrice}元</Text></View>
-                                                <View style={styles.qw}><Text style={{fontWeight:"bold"}}>{(goodsList.salePrice-0)*(item.stockNo-0)}元</Text></View>
-                                            </View>
-                                            <DashLine/>
+                                    <View key={index} style={{borderColor:"#f0f0f0",borderTopWidth:5,padding:10}}>
+                                        <View style={{padding:10}}>
+                                            <View>
+                                                <Text style={{fontWeight:"bold"}}>{`${_item.brandName} ${_item.goodsNo} ${_item.channelName}`}</Text>
+                                                <View style={{flexDirection:"row",marginTop:10,justifyContent:"space-between"}}>
+                                                    <View style={styles.qw}><Text>{item.modelName}码</Text></View>
+                                                    <View style={styles.qw}><Text><Text style={{color:"grey"}}>数量</Text>*{item.stockNo}</Text></View>
+                                                    <View style={styles.qw}><Text><Text style={{color:"grey"}}>单价:</Text>{_item.salePrice}元</Text></View>
+                                                    <View style={styles.qw}><Text style={{fontWeight:"bold"}}>{(_item.salePrice-0)*(item.stockNo-0)}元</Text></View>
+                                                </View>
+                                                <DashLine/>
 
-                                            <View style={{flexDirection:"row",marginTop:5,justifyContent:"space-between"}}>
+                                                <View style={{flexDirection:"row",marginTop:5,justifyContent:"space-between"}}>
 
-                                                <View  style={{flex:1,justifyContent:"center"}}><Text>快递选择</Text></View>
+                                                    <View  style={{flex:1,justifyContent:"center"}}><Text>快递选择</Text></View>
 
-                                                <View style={{flex:3,}}>
-                                                    <View style={{width:"90%"}}>
-                                                        <Picker
-                                                            data={item.templateList}
-                                                            cols={1}
-                                                            extra={'请选择快递'}
-                                                            value={item.templateListValue}
-                                                            onChange={itemm => {this.changePost(itemm,item)}}
-                                                            className="forss">
-                                                            <RoomInfo></RoomInfo>
-                                                        </Picker>
+                                                    <View style={{flex:3,}}>
+                                                        <View style={{width:"90%"}}>
+                                                            <Picker
+                                                                data={item.templateList}
+                                                                cols={1}
+                                                                extra={'请选择快递'}
+                                                                value={item.templateListValue}
+                                                                onChange={value => {this.changePost(value,item)}}
+                                                                className="forss">
+                                                                <RoomInfo></RoomInfo>
+                                                            </Picker>
+                                                        </View>
+
                                                     </View>
 
+                                                    <View style={{flex:1,justifyContent:"center",alignItems:"center"}}><Text>邮费:<Text style={{color:"orange"}}>{item.postFee}元</Text></Text></View>
                                                 </View>
+                                                <DashLine/>
 
-                                                <View style={{flex:1,justifyContent:"center",alignItems:"center"}}><Text>邮费:<Text style={{color:"orange"}}>{item.postFee}元</Text></Text></View>
-                                            </View>
-                                            <DashLine/>
+                                                <View style={{marginTop:5,flexDirection:"row",justifyContent:"space-between"}}>
+                                                    <View><Text>共计支付</Text></View>
+                                                    <View><Text style={{fontSize:22,color:"orange",fontWeight:"bold"}}>{item.goodsAmount&&item.goodsAmount.toFixed(2)}元</Text></View>
 
-                                            <View style={{marginTop:5,flexDirection:"row",justifyContent:"space-between"}}>
-                                                <View><Text>共计支付</Text></View>
-                                                <View><Text style={{fontSize:22,color:"orange",fontWeight:"bold"}}>{item.goodsAmount&&item.goodsAmount.toFixed(2)}元</Text></View>
+                                                </View>
 
                                             </View>
 
                                         </View>
 
                                     </View>
-
-                                </View>
-                            )
+                                )
+                            })
                         }
 
 

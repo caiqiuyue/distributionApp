@@ -63,14 +63,17 @@ export default class App extends React.Component {
 
     //支付
     onPay = ()=>{
-        let {payPassword} = this.state
+
+
+
+        let {payPassword} = this.state;
         if(!payPassword){
-            alert('请输入支付密码')
+            alert('请输入支付密码');
             return
         }
 
         if(payPassword && payPassword.length<6){
-            alert('请输入6位数支付密码')
+            alert('请输入6位数支付密码');
             return
         }
 
@@ -82,14 +85,13 @@ export default class App extends React.Component {
             skip_verify:"46396EF464AA44EFB155740B804ADBF2"
         }
 
+
+
         axios.post(`/order/orderPay`,data,)
             .then((res) =>{
                 console.log(res);
                 if(res.data.code==0){
-
-                    alert('支付成功')
-                    const { navigate } = this.props.navigation;
-                    navigate('GoodSelect',{ user: '' })
+                    this.props.aa(1)
 
                 }else {
                     alert(res.data.message)

@@ -571,7 +571,7 @@ import LinearGradient from 'react-native-linear-gradient';
                                                                 <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>商品信息</Text>
                                                             </View>
 
-                                                            <View style={{width:"100%",height:1,backgroundColor:"#ccc",marginTop:10}}></View>
+                                                            <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
 
 
                                                             <View style={styles.a}>
@@ -620,7 +620,7 @@ import LinearGradient from 'react-native-linear-gradient';
                                                                 <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>快递信息</Text>
                                                             </View>
 
-                                                            <View style={{width:"100%",height:1,backgroundColor:"#ccc",marginTop:10}}></View>
+                                                            <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
 
 
 
@@ -663,7 +663,7 @@ import LinearGradient from 'react-native-linear-gradient';
                                                                 <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>状态信息</Text>
                                                             </View>
 
-                                                            <View style={{width:"100%",height:1,backgroundColor:"#ccc",marginTop:10}}></View>
+                                                            <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
 
 
 

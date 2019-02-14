@@ -289,11 +289,35 @@ const RoomInfo2 = props => {
 
 
      details=(item)=>{
+
+
+
          this.setState({
              details: item,
              modalVisible: true,
              modal:"查看详情"
 
+         },()=>{
+             let  {details} = this.state
+             axios.get(`/order/orderPayView`,
+                 {
+                     parentId:item.parentId,
+                 },
+
+             )
+                 .then((response) =>{
+                     console.log(response);
+                     if(response.data.code==0){
+                         details.addressItem = response.data.data.address
+                         this.setState({
+                             details
+                         })
+                     }
+
+                 })
+                 .catch(function (error) {
+                     console.log(error);
+                 })
          })
      }
 
@@ -836,7 +860,7 @@ const RoomInfo2 = props => {
                                                                 <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>商品信息</Text>
                                                             </View>
 
-                                                            <View style={{width:"100%",height:1,backgroundColor:"#ccc",marginTop:10}}></View>
+                                                            <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
 
 
                                                             <View style={styles.a}>
@@ -873,7 +897,7 @@ const RoomInfo2 = props => {
                                                                 <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>快递信息</Text>
                                                             </View>
 
-                                                            <View style={{width:"100%",height:1,backgroundColor:"#ccc",marginTop:10}}></View>
+                                                            <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
 
 
 
@@ -884,6 +908,19 @@ const RoomInfo2 = props => {
                                                                 </View>
                                                             </View>
 
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>地址:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.addressItem&&details.addressItem.address}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>手机号:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.addressItem&&details.addressItem.phone}</Text>
+                                                                </View>
+                                                            </View>
 
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>邮费:</Text>
@@ -908,6 +945,7 @@ const RoomInfo2 = props => {
                                                                 </View>
                                                             </View>
 
+
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>快递策略:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
@@ -920,7 +958,7 @@ const RoomInfo2 = props => {
                                                                 <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>状态信息</Text>
                                                             </View>
 
-                                                            <View style={{width:"100%",height:1,backgroundColor:"#ccc",marginTop:10}}></View>
+                                                            <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
 
 
 

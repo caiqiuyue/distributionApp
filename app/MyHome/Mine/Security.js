@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     },
 
     aa:{
-        borderBottomColor:"#a3b9ce",
+        borderBottomColor:"#ffdac7",
         borderBottomWidth:1,
         flexDirection:"row",
         backgroundColor:"#fff",

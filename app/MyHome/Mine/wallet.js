@@ -429,8 +429,8 @@ const styles = StyleSheet.create({
     },
 
     aa:{
-        borderBottomColor:"#f0f0f0",
-        borderBottomWidth:3,
+        borderBottomColor:"#ffdac7",
+        borderBottomWidth:1,
         flexDirection:"row",
         backgroundColor:"#fff",
         padding:10,paddingTop:15,

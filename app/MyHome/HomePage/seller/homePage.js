@@ -19,8 +19,9 @@ import close from "../style/close.png";
 import AddModels from "./addModels";
 import topBg from "../style/topBg.png";
 import search from "../style/search.png";
+import add from "../../GoodSelect/style/add.png";
 import LinearGradient from "react-native-linear-gradient";
-
+import shose from "../style/shose.png";
 const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
@@ -1051,8 +1052,11 @@ export default class App extends React.Component {
 
 
                 <View style={{flexDirection:"row-reverse"}}>
-                    <TouchableHighlight onPress={this.submit} underlayColor="transparent" style={{alignItems:"center",justifyContent:"center",}}>
-                        <Text style={{color:"red",textDecorationLine:'underline'}}>商品上架</Text>
+                    <TouchableHighlight onPress={this.submit} underlayColor="transparent" >
+                        <View style={{flexDirection:"row",alignItems:"center",justifyContent:"center",}}>
+                            <View><Image source={add} style={{width:14,height:14}}></Image></View>
+                            <View><Text style={{color:"#f94939"}}>商品上架</Text></View>
+                        </View>
                     </TouchableHighlight>
                 </View>
 
@@ -1079,7 +1083,9 @@ export default class App extends React.Component {
 
                                 <TouchableHighlight onPress={()=>{this.changeGoodsInfo(item)}} underlayColor="transparent" >
                                     <View style={{flexDirection: 'row',padding:10}}>
-                                        <View style={{flex: 1,height: 100,borderColor:"#f0f0f0",borderWidth:1 }}></View>
+                                        <View style={{flex: 1,height: 100,borderColor:"#f0f0f0",borderWidth:1 }}>
+                                            <Image source={shose} style={{width:'100%',height:"100%",resizeMode:'stretch'}}/>
+                                        </View>
                                         <View style={{flexDirection:"row",flex: 3,paddingLeft: 10}}>
 
                                             <View style={{flex:1}}>
@@ -1096,7 +1102,7 @@ export default class App extends React.Component {
                                                 </View>
 
                                                 <View style={{flexDirection:"row",marginTop:5}}>
-                                                    <View style={styles.as}><Text style={{color:"grey",fontWeight:"bold"}}>{item.shelves==0?'下架':'上架'}</Text></View>
+                                                    <View style={styles.as}><Text style={{color:"grey",fontWeight:"bold"}}>已{item.shelves==0?'下架':'上架'}</Text></View>
                                                 </View>
                                             </View>
 
