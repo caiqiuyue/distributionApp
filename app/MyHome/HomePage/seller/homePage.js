@@ -135,12 +135,10 @@ export default class App extends React.Component {
         this.setState({
             padd:300,
         })
-
-
     }
 
     //查询渠道,上架弹框
-    submit=()=>{
+    submit=(item,data)=>{
 
 
         this.setState({
@@ -163,6 +161,12 @@ export default class App extends React.Component {
             modelList:[],
 
         },()=>{
+
+            if(item=='上架'){
+                console.log(data,'datadata');
+                this.setGoodsNo(data)
+            }
+
             axios.get(`/goods/getChannelKV`,{},
 
             )
@@ -253,7 +257,12 @@ export default class App extends React.Component {
     }
 
     _setModalVisible = (visible) => {
-        this.setState({ modalVisible: visible });
+
+        this.setState({ modalVisible: visible },()=>{
+            if(!visible){
+                this.props.navigation.setParams({publish:''})
+            }
+        });
     };
 
 
@@ -481,6 +490,16 @@ export default class App extends React.Component {
         this.searchGoods()
     }
 
+    componentWillReceiveProps(newporops) {
+
+        console.log(newporops.navigation.state.params,'componentWillReceiveProps');
+        let publishData = newporops.navigation.state.params;
+        if(publishData && publishData.publish){
+            this.submit('上架',publishData.publish.goodsNo);
+        }
+    }
+
+
 
     onRefresh = ()=>{
 
@@ -562,6 +581,7 @@ export default class App extends React.Component {
     submitChangeGoodsInfo = ()=>{
         let {shelves,editGoodsInfo,changeStock,changeSalePrice} = this.state;
 
+        this.props.navigation.setParams({publish:null})
         this.setState({
             modalVisible:false
         },()=>{
@@ -638,7 +658,7 @@ export default class App extends React.Component {
 
                                             <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='上架'?'商品上架':'修改'}</Text></View>
 
-                                            <TouchableHighlight underlayColor={"#fff"} onPress={this._setModalVisible.bind(this,false) } style={{}}>
+                                            <TouchableHighlight underlayColor={"#fff"} onPress={()=>{this._setModalVisible(false)}} style={{}}>
                                                 <Image style={{height:30,width:30}} source={close}/>
                                             </TouchableHighlight>
 
@@ -659,6 +679,7 @@ export default class App extends React.Component {
                                                                 placeholder={this.state.goodsNo?this.state.goodsNo:'请填写商品货号'}
                                                                 style={styles.teCor}
                                                                 underlineColorAndroid="transparent"
+                                                                value={this.state.goodsNo}
                                                                 onChangeText={(name) => this.setGoodsNo(name)}
                                                             />
                                                         </View>

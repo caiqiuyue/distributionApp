@@ -216,8 +216,8 @@ export default class Mine extends React.Component {
 
                             {
                                 this.state.imgArr.map((item,index)=>
-                                    <TouchableHighlight underlayColor="transparent" key={index} style={{height:210,marginTop:10}} onLongPress={()=>{this.deleteImg(item)}}>
-                                        <Image style={{height:200,width:"80%",resizeMode:"stretch"}}
+                                    <TouchableHighlight underlayColor="transparent" key={index} style={{height:210,marginTop:10}} onPress={()=>{this.deleteImg(item)}}>
+                                        <Image style={{height:200,width:"80%",resizeMode:"contain"}}
                                                source={{uri:item.uri}}
                                         />
                                     </TouchableHighlight>

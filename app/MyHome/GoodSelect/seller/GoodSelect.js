@@ -55,7 +55,7 @@ const RoomInfo2 = props => {
                 },
 
                 {
-                    value:"已完成订单",
+                    value:"所有订单",
                     flag:false
                 },
 

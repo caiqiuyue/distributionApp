@@ -8,6 +8,7 @@ import Mine from '../../MyHome/Mine/MineBox';
 import TabBarItem from './TabBarItem';
 import TabBarLabel from './TabBarLabel';
 import Message from '../../MyHome/Message/message';
+import Publish from '../../MyHome/Publish/publishBox';
 import GoodSelect from '../../MyHome/GoodSelect/GoodSelect';
 import CodePush from 'react-native-code-push'
 import Order from '../../MyHome/Order/Order';
@@ -40,6 +41,42 @@ const Tab = TabNavigator(
                             focused={focused}
                             normalImage={require('./home1.png')}
                             selectedImage={require('./home2.png')}
+                        />
+
+
+                    ),
+
+                })
+            },
+        },
+
+
+        Publish:{
+            screen:Publish,
+            navigationOptions:({navigation}) => {
+
+                if(navigation.isFocused()){
+                    CodePush.sync();
+                    CodePush.allowRestart();//在加载完了可以允许重启
+                }
+
+                return ({
+                    tabBarLabel:({focused,tintColor}) => (
+                        <TabBarLabel
+                            navigation={navigation}
+                            nameKey={'6'}
+                            tintColor={tintColor}
+                            focused={focused}
+                            lableName={'大厅'}
+                        />),
+                    tabBarIcon:({focused,tintColor}) => (
+                        <TabBarItem
+                            navigation={navigation}
+                            nameKey={'6'}
+                            tintColor={tintColor}
+                            focused={focused}
+                            normalImage={require('./publish.png')}
+                            selectedImage={require('./publish.png')}
                         />
 
 

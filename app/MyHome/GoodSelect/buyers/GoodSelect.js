@@ -57,7 +57,7 @@ const RoomInfo2 = props => {
                 },
 
                 {
-                    value:"已完成订单",
+                    value:"所有订单",
                     flag:false
                 },
 
@@ -768,10 +768,14 @@ const RoomInfo2 = props => {
 
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text style={{color:"red"}}>已完成></Text>
+                                                        <Text>{item.orderState==-1?'删除':item.orderState==1?'买家新建':item.orderState==2?'卖家反馈中':item.orderState==3?'买家撤销':item.orderState==4?'卖家接受':item.orderState==5?'卖家拒绝':item.orderState==6?'订单异议':'订单关闭'}</Text>
+                                                        <Text style={{marginTop:5,color:"red"}}>{item.capitalState==0?'待支付':item.capitalState==1?'买家已付款':item.capitalState==2?'平台托管':item.capitalState==3?'平台解付中':item.capitalState==4?'卖家已收款':item.capitalState==5?'卖家已退款':item.capitalState==6?'平台托管':item.capitalState==7?'平台解付':'买家已退款'}
+
+                                                            <Text>></Text>
+
+                                                        </Text>
+
                                                     </View>
-
-
 
 
                                                 </View>

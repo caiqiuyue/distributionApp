@@ -556,6 +556,50 @@ export default class App extends React.Component {
         this.saveGoodsDatas(goodsDatas)
     }
 
+    componentWillReceiveProps(newporops) {
+
+        console.log(newporops.navigation.state.params,'componentWillReceiveProps');
+        let getSearchShop = newporops.navigation.state.params;
+        if(getSearchShop && getSearchShop.getSearchShop){
+            this.setState({
+                goodsName:getSearchShop.getSearchShop.goodsNo
+            },()=>{
+                axios.post(`/goods/searchGoods`,
+                    {
+                        goodsNo:this.state.goodsName,
+                        current:1,
+                        pageSize:10,
+                        sellerId: getSearchShop.getSearchShop.userId,
+                        modelName: getSearchShop.getSearchShop.model
+                    },
+
+                )
+                    .then((response) =>{
+                        console.log(response);
+                        this.setState({
+                            aa:true,
+                            refreshing:false,
+
+                        },()=>{
+                            if(response.data.code==0){
+                                this.setState({
+                                    goodsList:response.data.data.goodsList
+                                })
+                            }
+                        })
+
+
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+            })
+
+
+        }
+    }
+
     render() {
         let {goodsItem,goodsList,refreshing,goodsDatas} = this.state;
         let num = 0;
@@ -781,6 +825,7 @@ export default class App extends React.Component {
                                     placeholder={'请输入货号名'}
                                     style={{minWidth:'100%',backgroundColor:"#fff",padding:5}}
                                     underlineColorAndroid="transparent"
+                                    value={this.state.goodsName}
                                     onChangeText={(goodsName) => this.setState({goodsName})}
                                 />
                             </View>
@@ -898,6 +943,7 @@ export default class App extends React.Component {
 
 
 
+
                                     </View>
 
                                 </View>
@@ -923,10 +969,7 @@ export default class App extends React.Component {
 
                                 </View>
 
-
-
                             </View>
-
 
                         )}
                     />

@@ -8,6 +8,7 @@ import Mine from "../../MyHome/Mine/Mine";
 import GoodSelect from "../../MyHome/GoodSelect/buyers/GoodSelect";
 import TabHome from "../../MyHome/HomePage/buyers/homePage";
 import Order from "../../MyHome/Order/Order";
+import Publish from '../../MyHome/Publish/publishBox';
 
 class TabBarLabel extends Component {
 
@@ -23,6 +24,9 @@ class TabBarLabel extends Component {
             }else if(this.props.nameKey === '5'){
 
                 this.props.navigation.navigate('Order',{ user: '' })
+            }else if(this.props.nameKey === '6'){
+
+                this.props.navigation.navigate('Publish',{ user: '' })
             }
             else {
                 this.props.navigation.navigate('Mine',{ user: '' })
