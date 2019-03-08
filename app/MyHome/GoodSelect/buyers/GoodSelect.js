@@ -994,6 +994,13 @@ const RoomInfo2 = props => {
                                                                 </View>
                                                             </View>
 
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>备注:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>details.remark</Text>
+                                                                </View>
+                                                            </View>
+
                                                         </ScrollView>
 
                                                         {details.capitalState==0&&

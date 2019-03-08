@@ -13,7 +13,6 @@ import {bindActionCreators} from 'redux';
 import {getData} from "../../components/active/reducer";
 import s1 from "../HomePage/style/234.png";
 import close from "../HomePage/style/close.png";
-import read from './style/read.png'
 import LinearGradient from 'react-native-linear-gradient';
 import TabHome from "../HomePage/homepageBox";
 import add from "../GoodSelect/style/add.png";
@@ -393,7 +392,7 @@ class ReadMessage extends React.Component {
             return
         }
 
-        if(!content){
+        if(!content || content.trim()==''){
             alert('请输入描述内容')
             return
         }
@@ -647,10 +646,11 @@ class ReadMessage extends React.Component {
                                                                 <TextInput
                                                                     placeholder={this.state.content?this.state.content:'请填写描述内容'}
                                                                     style={[styles.teCor,{height:100}]}
+                                                                    placeholderTextColor={this.publish?"#000":'#ccc'}
                                                                     multiline={true}
                                                                     editable={!this.publish}
                                                                     underlineColorAndroid="transparent"
-                                                                    value={this.state.content}
+                                                                    // value={this.state.content}
                                                                     onFocus={this.focus}
                                                                     onChangeText={(content) => this.setState({content})}
                                                                 />

@@ -41,7 +41,7 @@ class TabBarLabel extends Component {
                 <View>
                     <Text style={{...Platform.select({
                             android: {
-                                left:"35%"
+                                left:"31%"
                             },
                             ios:{
 

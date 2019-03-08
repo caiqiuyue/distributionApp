@@ -980,6 +980,12 @@ const RoomInfo2 = props => {
                                                                     <Text style={{flex:1}}>{details.capitalState==0?'待支付':details.capitalState==1?'买家已付款':details.capitalState==2?'平台托管':details.capitalState==3?'平台解付中':details.capitalState==4?'卖家已收款':details.capitalState==5?'卖家已退款':details.capitalState==6?'平台托管':details.capitalState==7?'平台解付':'买家已退款'}</Text>
                                                                 </View>
                                                             </View>
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>备注:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>details.remark</Text>
+                                                                </View>
+                                                            </View>
                                                         </ScrollView>
 
                                                         {details.capitalState==1&&

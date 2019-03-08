@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import axios from '../../../axios'
-import moment from "moment";
+import {Picker} from "antd-mobile";
 import LinearGradient from "react-native-linear-gradient";
 import close from "../style/close.png";
 import shose from "../style/shose.png";
@@ -19,6 +19,18 @@ import topBg from "../style/topBg.png";
 import search from "../style/search.png";
 import cart from "../style/cart.png";
 import deleteIcon from  '../../GoodSelect/style/delete.png'
+import s1 from "../style/234.png";
+const RoomInfo = props => {
+    return (
+        <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
+
+            <View style={{backgroundColor:"#fff",flexDirection:"row",width:"100%",borderColor:"#ccc",borderWidth:1,borderRadius:15,overflow:'hidden'}}>
+                <View style={{flex:3,padding:8}}><Text>{props.extra}</Text></View>
+                <View style={{flex:1,padding:8,backgroundColor:'#f96f59',alignItems:"center",justifyContent:"center",borderColor:"#f96f59",borderWidth:1,}}><Image style={{height:10,width:15}} source={s1}/></View>
+            </View>
+        </TouchableHighlight>
+    )
+};
 export default class App extends React.Component {
 
 
@@ -37,7 +49,24 @@ export default class App extends React.Component {
             modalVisible: false,//模态场景是否可见
             transparent: true,//是否透明显示
             goodsItem:{},
-            goodsDatas: []
+            goodsDatas: [],
+            orderStatu: ['asc'],
+            orderStatus:[
+
+                {
+                    label:"价格升序",
+                    value:'asc'
+                },
+
+                {
+                    label:"价格降序",
+                    value:'desc'
+                },
+
+
+
+
+            ],
 
         };
 
@@ -45,6 +74,18 @@ export default class App extends React.Component {
         this.addCart = null
 
 
+    }
+
+    setOrdStatu = (item)=>{
+
+        this.setState({
+            orderStatu:item,
+            // goodsList,
+        },()=>{
+            this.onRefresh()
+
+
+        })
     }
 
 
@@ -102,6 +143,7 @@ export default class App extends React.Component {
 
     componentWillUnmount(){
         this.yiPay&&this.yiPay.remove();
+        this.timer &&  clearTimeout(this.timer);
     };
 
     //打开弹框
@@ -128,13 +170,14 @@ export default class App extends React.Component {
 
         if(!noData){
             this.setState({
-                pages:pages+1
+                pages:pages+1,
             },()=>{
                 axios.post(`/goods/searchGoods`,
                     {
                         goodsNo:this.state.goodsName,
                         current:this.state.pages,
                         pageSize:10,
+                        orderByType:this.state.orderStatu[0]
                     },
 
                 )
@@ -350,11 +393,14 @@ export default class App extends React.Component {
 
     //搜索货物
     searchGoods = ()=>{
+        console.log(this.state.orderStatu,'ordStatuordStatuordStatu');
+        // console.log(this.state.ordStatu[0]);
         axios.post(`/goods/searchGoods`,
             {
                 goodsNo:this.state.goodsName,
                 current:1,
                 pageSize:10,
+                orderByType:this.state.orderStatu[0]
             },
 
         )
@@ -570,7 +616,8 @@ export default class App extends React.Component {
                         current:1,
                         pageSize:10,
                         sellerId: getSearchShop.getSearchShop.userId,
-                        modelName: getSearchShop.getSearchShop.model
+                        modelName: getSearchShop.getSearchShop.model,
+                        orderByType:this.state.orderStatu[0]
                     },
 
                 )
@@ -846,7 +893,18 @@ export default class App extends React.Component {
                 </View>
 
 
-                <View style={{flexDirection:"row-reverse"}}>
+                <View style={{flexDirection:"row",justifyContent:"space-between"}}>
+                    <View style={{width:"50%"}}>
+                        <Picker
+                            data={this.state.orderStatus}
+                            cols={1}
+                            value={this.state.orderStatu}
+                            extra='价格排序'
+                            onChange={ordStatu => {this.setOrdStatu(ordStatu)}}
+                            className="forss">
+                            <RoomInfo></RoomInfo>
+                        </Picker>
+                    </View>
                     <TouchableHighlight onPress={this.shoppingCart} underlayColor="transparent" >
                         <View style={{flexDirection:"row",alignItems:"center",justifyContent:"center",}}>
                             <View><Image source={cart} style={{width:20,height:20}}></Image></View>
@@ -875,14 +933,15 @@ export default class App extends React.Component {
                                     </View>
                                     <View style={{flex: 3,paddingLeft: 10,paddingRight: 10}}>
                                         <Text>{`${item.brandName} ${item.goodsNo}`}</Text>
+                                        <Text style={{marginTop:10}}>{`库存日期: ${item.stockTime}`}</Text>
                                         <View style={{flexDirection:"row",marginTop:10}}>
-                                            <View style={styles.qw}><Text style={{color:"#f94939"}}>{item.feedbackTime>24?`${item.feedbackTime}小时`:'当天'}反馈</Text></View>
+                                            {/*<View style={styles.qw}><Text style={{color:"#f94939"}}>{item.feedbackTime>24?`${item.feedbackTime}小时`:'当天'}反馈</Text></View>*/}
                                             <View style={styles.qw}><Text style={{color:"#f94939"}}>配货率{item.goodsRate}%</Text></View>
                                             <View style={styles.qw}><Text style={{color:"#f94939"}}>{item.sendTime}天发货</Text></View>
                                         </View>
 
                                         <View style={{flexDirection:"row",marginTop:5}}>
-                                            <View style={styles.as}><Text style={{fontSize:22,color:"orange"}}>{item.salePrice}</Text></View>
+                                            <View style={styles.as}><Text style={{fontSize:22,color:"orange",fontWeight:"bold"}}>{item.salePrice}</Text></View>
                                             <View style={[styles.as,{marginRight:30}]}><Text style={{color:"grey",textDecorationLine:"line-through"}}>{item.marketPrice}</Text></View>
                                             <View style={styles.as}><Text>{item.channelName}</Text></View>
                                         </View>

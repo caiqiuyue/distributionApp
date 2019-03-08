@@ -600,7 +600,7 @@ export default class App extends React.Component {
                 a.modelId = item.modelId
                 a.goodsNum = item.stockNo
                 a.goodsPrice = (_item.salePrice-0)
-                a.goodsAmount = (_item.salePrice-0)+(item.postFee-0)
+                a.goodsAmount = ((_item.salePrice-0)*(item.stockNo-0))+(item.postFee-0)
                 a.channelId = _item.channelId
                 a.goodsId = _item.goodsId
                 a.goodsNo = _item.goodsNo
@@ -822,6 +822,7 @@ export default class App extends React.Component {
                                                                 placeholder={this.state.phoneNo?this.state.phoneNo:'请输入收货人电话'}
                                                                 style={styles.teCor}
                                                                 underlineColorAndroid="transparent"
+                                                                keyboardType={'numeric'}
                                                                 onChangeText={(phoneNo) => this.setState({phoneNo})}
                                                             />
                                                         </View>
