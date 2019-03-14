@@ -54,6 +54,7 @@ export default class App extends React.Component {
 
 
     topUp = ()=>{
+        this.props._setModalVisible(false)
         const { navigate } = this.props.navigation;
         navigate('TopUp',{ user: '' });
     }
@@ -63,8 +64,6 @@ export default class App extends React.Component {
 
     //支付
     onPay = ()=>{
-
-
 
         let {payPassword} = this.state;
         if(!payPassword){
@@ -91,7 +90,9 @@ export default class App extends React.Component {
             .then((res) =>{
                 console.log(res);
                 if(res.data.code==0){
-                    this.props.aa(1)
+                    this.props._setModalVisible(false)
+                    const { navigate } = this.props.navigation;
+                    navigate('GoodSelect',{ user: '' });
 
                 }else {
                     alert(res.data.message)

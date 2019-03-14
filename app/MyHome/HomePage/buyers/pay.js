@@ -378,17 +378,6 @@ export default class App extends React.Component {
     }
 
 
-    aa = () => {
-        this.setState({ modalVisible: false },()=>{
-            Toast.info('支付成功');
-            console.log(this.state.modalVisible,'modalVisiblemodalVisible');
-            const { navigate } = this.props.navigation;
-            navigate('GoodSelect',{ user: '' })
-        });
-
-
-    };
-
 
     //快递名称修改
     changePost = (ite,iit) => {
@@ -910,7 +899,7 @@ export default class App extends React.Component {
                                                         </TouchableHighlight>
                                                     </View>
 
-                                                </View>:<PayComponents aa={()=>{this.aa()}} payDatas={this.state.payDatas} parentId={this.parentId}/>}
+                                                </View>:<PayComponents _setModalVisible={this._setModalVisible} navigation={this.props.navigation}  payDatas={this.state.payDatas} parentId={this.parentId}/>}
 
                                             </ScrollView>
                                         </View>

@@ -244,7 +244,7 @@ export default class Login extends Component {
                 loginId: this.state.userName,
                 password: this.state.password,
                 realName: this.state.realName,
-                mobile: this.state.companyPhone,
+                storeLink: this.state.companyPhone,
                 sex: this.state.sex,
                 role: this.state.roleStr,
                 email: this.state.email,
@@ -588,7 +588,7 @@ export default class Login extends Component {
                                                 <View style={{justifyContent:'center',}}><Image source={companyPhone} style={styles.iconImg}/></View>
                                                 <View style={{justifyContent:'center',alignItems:"center",marginLeft:10}}>
                                                     <TextInput
-                                                        placeholder="请输入公司电话"
+                                                        placeholder="请输入店铺链接"
                                                         style={{minWidth:300,padding:5}}
                                                         onFocus={this.focus}
                                                         keyboardType='numeric'

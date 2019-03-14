@@ -199,6 +199,12 @@ class ReadMessage extends React.Component {
         this.getPublishList()
 
     }
+    componentWillReceiveProps(){
+
+        this.getTradeMarketList()
+        this.getPublishList()
+
+    }
 
 
 

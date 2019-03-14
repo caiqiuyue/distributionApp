@@ -16,6 +16,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {setHotelNo} from "../../../components/active/reducer";
 import LinearGradient from 'react-native-linear-gradient';
+import search from "../../HomePage/style/search.png";
 const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
@@ -70,6 +71,13 @@ const RoomInfo2 = props => {
             noData:false,
             details:{},
             modal:"",
+            date1:null,
+            date2:null,
+            custOrderNo:null,
+            channelName:null,
+            name:null,
+            phone:null,
+            padd:0,
             templateListValue:[],
             templateList:[],
             animationType: 'none',//none slide fade
@@ -145,6 +153,8 @@ const RoomInfo2 = props => {
 
      //获取未完成
      getBuyerOrder = ()=>{
+         let {date1,date2,custOrderNo,channelName,name,phone,} = this.state
+
 
          this.setState({
              refreshing:false,
@@ -155,7 +165,9 @@ const RoomInfo2 = props => {
              {
                  current:1,
                  pageSize:10,
-                 status:this.state.ordStatu[0]-0
+                 status:this.state.ordStatu[0]-0,
+                 beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
+                 endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
              },
 
          )
@@ -185,8 +197,80 @@ const RoomInfo2 = props => {
              })
      }
 
+     focus=()=>{
+
+         this.setState({
+             padd:300,
+         })
+     }
+
+     //查询
+     submitSearchOrder = ()=>{
+         let {changeMsg,date1,date2,custOrderNo,channelName,name,phone,} = this.state
+         this.setState({
+             modalVisible:false
+         },()=>{
+             axios.post(`/order/getSellerOrder`,
+                 {
+                     current:1,
+                     pageSize:10,
+                     beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
+                     endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
+                     status:changeMsg=='未完成订单'?this.state.ordStatu[0]-0:null
+                 },
+
+             )
+                 .then((response) =>{
+                     console.log(response,'查询未完成');
+                     if(response.data.code==0){
+
+                         if(changeMsg=='未完成订单'){
+                             this.setState({
+                                 unfinished:response.data.data.orderList?response.data.data.orderList.filter(item=> {return item.orderState!=7}):[],
+                                 // finished:response.data.data.orderList?response.data.data.orderList.filter(item=> {return item.orderState==7}):[],
+                             })
+                         }else {
+                             this.setState({
+                                 // unfinished:response.data.data.orderList?response.data.data.orderList.filter(item=> {return item.orderState!=7}):[],
+                                 finished:response.data.data.orderList?response.data.data.orderList:[],
+                             })
+                         }
+
+
+                     }else{
+                         Toast.info(response.data.message,1)
+                     }
+
+
+
+                 })
+                 .catch(function (error) {
+                     console.log(error);
+                 })
+         })
+
+     }
+
+
+
+     //重置
+
+     resetSearchOrder = ()=>{
+
+         this.setState({
+             date1:null,
+             date2:null,
+             custOrderNo:null,
+             channelName:null,
+             name:null,
+             phone:null,
+         })
+
+     }
+
      //已完成
      getSellerOrder = ()=>{
+         let {date1,date2,custOrderNo,channelName,name,phone,} = this.state
 
 
          this.setState({
@@ -196,7 +280,9 @@ const RoomInfo2 = props => {
              {
                  current:1,
                  pageSize:10,
-                 status:5
+                 beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
+                 endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
+
              },
 
          )
@@ -227,6 +313,11 @@ const RoomInfo2 = props => {
      }
 
      componentWillMount() {
+         this.getBuyerOrder()
+         this.getSellerOrder()
+
+     }
+     componentWillReceiveProps() {
          this.getBuyerOrder()
          this.getSellerOrder()
 
@@ -274,7 +365,7 @@ const RoomInfo2 = props => {
     }
 
      onEndReached = ()=>{
-         let {pages,unfinished,finished,noData} = this.state;
+         let {date1,date2,custOrderNo,channelName,name,phone,pages,unfinished,finished,noData} = this.state;
 
 
          if(!noData){
@@ -285,7 +376,10 @@ const RoomInfo2 = props => {
                      {
                          current:this.state.pages,
                          pageSize:10,
-                         status:this.state.ordStatu[0]-0
+                         status:this.state.ordStatu[0]-0,
+                         beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
+                         endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
+
                      },
 
                  )
@@ -329,7 +423,9 @@ const RoomInfo2 = props => {
                      {
                          current:this.state.pages,
                          pageSize:10,
-                         status:5
+                         beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
+                         endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
+
                      },
 
                  )
@@ -384,6 +480,21 @@ const RoomInfo2 = props => {
              this.getSellerOrder()
 
          })
+     }
+
+     focus=()=>{
+
+         this.setState({
+             padd:300,
+         })
+     }
+
+     searchOrder = ()=>{
+         this.setState({
+             modalVisible:true,
+             modal:'搜索商品',padd:0
+         })
+
      }
 
 
@@ -629,18 +740,23 @@ const RoomInfo2 = props => {
                                 }),}}>
 
 
-                                <View style={{width:"50%",marginTop:5}}>
-                                    <Picker
-                                        data={this.state.orderStatus}
-                                        cols={1}
-                                        value={ordStatu}
-                                        // extra='请选择上户人'
-                                        // onChange={(data) => {this.setCity(data)}}
-                                        onChange={ordStatu => {this.setOrdStatu(ordStatu)}}
-                                        // onOk={data => {this.setState({sale:data})}}
-                                        className="forss">
-                                        <RoomInfo></RoomInfo>
-                                    </Picker>
+                                <View  style={{marginTop:5,flexDirection:"row",justifyContent:"space-between"}}>
+                                    <View style={{width:"50%"}}>
+                                        <Picker
+                                            data={this.state.orderStatus}
+                                            cols={1}
+                                            value={ordStatu}
+                                            // extra='请选择上户人'
+                                            // onChange={(data) => {this.setCity(data)}}
+                                            onChange={ordStatu => {this.setOrdStatu(ordStatu)}}
+                                            // onOk={data => {this.setState({sale:data})}}
+                                            className="forss">
+                                            <RoomInfo></RoomInfo>
+                                        </Picker>
+                                    </View>
+                                    <TouchableHighlight underlayColor="transparent" onPress={this.searchOrder} style={{alignItems:"center",justifyContent:"center",marginRight:10}}>
+                                        <Image source={search} style={{width:20,height:20}}/>
+                                    </TouchableHighlight>
                                 </View>
 
 
@@ -708,13 +824,20 @@ const RoomInfo2 = props => {
                             <View style={{
                                 ...Platform.select({
                                     android:{
-                                        paddingBottom:185,
+                                        paddingBottom:260,
                                     },
                                     ios:{
-                                        // paddingBottom:230,
-                                        paddingBottom:155,
+                                        // paddingBottom:270,
+                                        paddingBottom:230,
                                     }
                                 }),}}>
+
+
+                                <View  style={{marginTop:5,flexDirection:"row-reverse"}}>
+                                    <TouchableHighlight underlayColor="transparent" onPress={this.searchOrder} style={{alignItems:"center",justifyContent:"center",marginRight:10}}>
+                                        <Image source={search} style={{width:20,height:20}}/>
+                                    </TouchableHighlight>
+                                </View>
                                 <View>
                                     <FlatList
                                         data={finished}  //列表的渲染数据源
@@ -758,7 +881,12 @@ const RoomInfo2 = props => {
 
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text style={{color:"red"}}>已完成></Text>
+                                                        <Text>{item.orderState==-1?'删除':item.orderState==1?'买家新建':item.orderState==2?'卖家反馈中':item.orderState==3?'买家撤销':item.orderState==4?'卖家接受':item.orderState==5?'卖家拒绝':item.orderState==6?'订单异议':'订单关闭'}</Text>
+                                                        <Text style={{marginTop:5,color:"red"}}>{item.capitalState==0?'待支付':item.capitalState==1?'买家已付款':item.capitalState==2?'平台托管':item.capitalState==3?'平台解付中':item.capitalState==4?'卖家已收款':item.capitalState==5?'卖家已退款':item.capitalState==6?'平台托管':item.capitalState==7?'平台解付':'买家已退款'}
+
+                                                            <Text>></Text>
+
+                                                        </Text>
                                                     </View>
 
 
@@ -797,7 +925,7 @@ const RoomInfo2 = props => {
                                     <View>
                                         <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
 
-                                            <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看详情'?'查看详情':this.state.modal=='取消订单'?'取消订单':this.state.modal=='配货'?'配货':"发货"}</Text></View>
+                                            <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看详情'?'查看详情':this.state.modal=='取消订单'?'取消订单':this.state.modal=='配货'?'配货':this.state.modal=='搜索商品'?'查询':"发货"}</Text></View>
 
 
 
@@ -983,7 +1111,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>备注:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>details.remark</Text>
+                                                                    <Text style={{flex:1}}>{details.remark}</Text>
                                                                 </View>
                                                             </View>
                                                         </ScrollView>
@@ -1120,8 +1248,118 @@ const RoomInfo2 = props => {
 
 
                                                         </View>:
+                                                        this.state.modal=='搜索商品'?
+                                                            <View style={{padding:10}}>
 
-                                                        <View style={{padding:10}}>
+                                                                <View>
+                                                                    <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
+                                                                        <View style={{paddingBottom:this.state.padd}}>
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>开始日期:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <DatePicker
+                                                                                        extra="请选择开始日期"
+                                                                                        format={val => moment(val).format('YYYY-MM-DD')}
+                                                                                        value={this.state.date1}
+                                                                                        mode="date"
+                                                                                        onChange={date1 => this.setState({date1})}
+                                                                                    >
+                                                                                        <RoomInfo2></RoomInfo2>
+                                                                                    </DatePicker>
+                                                                                </View>
+                                                                            </View>
+
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>结束日期:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <DatePicker
+                                                                                        extra="请选择结束日期"
+                                                                                        format={val => moment(val).format('YYYY-MM-DD')}
+                                                                                        value={this.state.date2}
+                                                                                        mode="date"
+                                                                                        onChange={date2 => this.setState({date2})}
+                                                                                    >
+                                                                                        <RoomInfo2></RoomInfo2>
+                                                                                    </DatePicker>
+                                                                                </View>
+                                                                            </View>
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>单据编号:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <TextInput
+                                                                                        placeholder={'请填写单据编号'}
+                                                                                        onFocus={this.focus}
+                                                                                        style={styles.teCor}
+                                                                                        underlineColorAndroid="transparent"
+                                                                                        onChangeText={(custOrderNo) => this.setState({custOrderNo})}
+                                                                                    />
+                                                                                </View>
+                                                                            </View>
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>仓库名称:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <TextInput
+                                                                                        placeholder={'请填写仓库名称'}
+                                                                                        onFocus={this.focus}
+                                                                                        style={styles.teCor}
+                                                                                        underlineColorAndroid="transparent"
+                                                                                        onChangeText={(channelName) => this.setState({channelName})}
+                                                                                    />
+                                                                                </View>
+                                                                            </View>
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>客户姓名:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <TextInput
+                                                                                        placeholder={'请填写客户姓名'}
+                                                                                        onFocus={this.focus}
+                                                                                        style={styles.teCor}
+                                                                                        underlineColorAndroid="transparent"
+                                                                                        onChangeText={(name) => this.setState({name})}
+                                                                                    />
+                                                                                </View>
+                                                                            </View>
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>手机号:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <TextInput
+                                                                                        placeholder={'请填写手机号'}
+                                                                                        onFocus={this.focus}
+                                                                                        style={styles.teCor}
+                                                                                        keyboardType={'numeric'}
+                                                                                        underlineColorAndroid="transparent"
+                                                                                        onChangeText={(phone) => this.setState({phone})}
+                                                                                    />
+                                                                                </View>
+                                                                            </View>
+
+                                                                            <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
+
+
+                                                                                <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                                    <TouchableHighlight onPress={this.submitSearchOrder} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                                        <Text style={{color:"#fff"}}>查询</Text>
+                                                                                    </TouchableHighlight>
+                                                                                </LinearGradient>
+
+
+                                                                                <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                                    <TouchableHighlight onPress={this.resetSearchOrder} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                                        <Text style={{color:"#fff"}}>重置</Text>
+                                                                                    </TouchableHighlight>
+                                                                                </LinearGradient>
+
+
+
+                                                                            </View>
+                                                                        </View>
+
+                                                                    </ScrollView>
+                                                                </View>
+
+                                                            </View>
+
+                                                        :<View style={{padding:10}}>
 
                                                             <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
 

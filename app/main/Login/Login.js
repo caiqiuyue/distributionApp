@@ -210,6 +210,9 @@ export default class Login extends Component {
 
                     if(response.data.code!=0){
                         Toast.info(response.data.message, 1);
+                        this.setState({
+                            code:null
+                        })
                         this.changeCode()
 
                     } else {

@@ -236,6 +236,9 @@ import LinearGradient from 'react-native-linear-gradient';
      componentWillMount() {
          this.getAll()
      }
+     componentWillReceiveProps() {
+         this.getAll()
+     }
 
 
      details=(item)=>{
