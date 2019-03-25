@@ -25,8 +25,8 @@ export default class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            phone: global.realname?global.realname:'',
-            password: global.password?global.password:'',
+            phone: '',
+            password: '',
             phoneType: false,
             passwordType: false,
             url:"",
@@ -89,6 +89,7 @@ export default class Login extends Component {
         
         JPushModule.getRegistrationID(id =>{
             let registrationId = id;
+            // alert(registrationId)
             this.setState({
                 registrationId
             })
@@ -180,6 +181,7 @@ export default class Login extends Component {
     handleSubmit = () => {
 
         const { roleStr,phone, password,url ,code,codeData} = this.state;
+        // alert(this.state.registrationId)
 
         if(phone.trim()==''){
             Toast.info('账号不能为空',1);
@@ -195,6 +197,7 @@ export default class Login extends Component {
             return
         }else{
             const { navigate, Reset } = this.props.navigation;
+
 
             //这里发送Ajax
             axios.post(`${url}/user/login`, {
@@ -234,11 +237,11 @@ export default class Login extends Component {
                         let username = data;
                         username.paySmsCodeFlag = false;
                         username.roleStr = roleStr;
-                        username.realname = phone;
-                        username.password = password;
+                        // username.realname = phone;
+                        // username.password = password;
                         global.roleStr = roleStr;
-                        global.realname = phone;
-                        global.password = password;
+                        // global.realname = phone;
+                        // global.password = password;
 
 
 
@@ -373,7 +376,8 @@ export default class Login extends Component {
                                                     placeholder="账号"
                                                     style={{minWidth:300,padding:5}}
                                                     onFocus={this.focus}
-                                                    value={phone}
+                                                    // value={phone}
+                                                    autoCapitalize={'none'}
                                                     underlineColorAndroid="transparent"
                                                     onChangeText={(phone) => this.handlePhoneChange(phone)}
                                                 >
@@ -392,7 +396,8 @@ export default class Login extends Component {
                                                     secureTextEntry={passwordT?true:false}
                                                     underlineColorAndroid="transparent"
                                                     onFocus={this.focus}
-                                                    value={password}
+                                                    autoCapitalize={'none'}
+                                                    // value={password}
                                                     onChangeText={(passwordType) => this.handlePasswordChange(passwordType)}
                                                 >
                                                 </TextInput>
@@ -416,6 +421,7 @@ export default class Login extends Component {
                                                         style={{minWidth:100,padding:5}}
                                                         underlineColorAndroid="transparent"
                                                         onFocus={this.focus}
+                                                        autoCapitalize={'none'}
                                                         onChangeText={(code) => this.setState({code})}
                                                     >
                                                     </TextInput>
@@ -423,7 +429,7 @@ export default class Login extends Component {
                                             </View>
 
                                             <TouchableHighlight style={{justifyContent:'center',flex:2,}} underlayColor="transparent" onPress={this.changeCode}>
-                                                <Image style={{resizeMode:"stretch",width:'100%',height:30}} source={{uri:codeData.image}}/>
+                                                <Image style={{resizeMode:"stretch",width:'100%',height:40}} source={{uri:codeData.image}}/>
                                             </TouchableHighlight>
                                         </View>
 

@@ -16,7 +16,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {setHotelNo} from "../../../components/active/reducer";
 import LinearGradient from 'react-native-linear-gradient';
-import search from "../../HomePage/style/search.png";
+import search from "../../HomePage/style/search.png";import select from '../../select.png'
 const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
@@ -164,7 +164,7 @@ const RoomInfo2 = props => {
          axios.post(`/order/getSellerOrder`,
              {
                  current:1,
-                 pageSize:10,
+                 pageSize:50,
                  status:this.state.ordStatu[0]-0,
                  beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
                  endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
@@ -213,7 +213,7 @@ const RoomInfo2 = props => {
              axios.post(`/order/getSellerOrder`,
                  {
                      current:1,
-                     pageSize:10,
+                     pageSize:50,
                      beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
                      endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
                      status:changeMsg=='未完成订单'?this.state.ordStatu[0]-0:null
@@ -279,7 +279,7 @@ const RoomInfo2 = props => {
          axios.post(`/order/getSellerOrder`,
              {
                  current:1,
-                 pageSize:10,
+                 pageSize:50,
                  beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
                  endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
 
@@ -375,7 +375,7 @@ const RoomInfo2 = props => {
                  axios.post(`/order/getSellerOrder`,
                      {
                          current:this.state.pages,
-                         pageSize:10,
+                         pageSize:50,
                          status:this.state.ordStatu[0]-0,
                          beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
                          endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
@@ -422,7 +422,7 @@ const RoomInfo2 = props => {
                  axios.post(`/order/getSellerOrder`,
                      {
                          current:this.state.pages,
-                         pageSize:10,
+                         pageSize:50,
                          beginDate:date1&&moment(date1).format('YYYY-MM-DD'),
                          endDate:date2&&moment(date2).format('YYYY-MM-DD'),custOrderNo,channelName,name,phone,
 
@@ -474,7 +474,7 @@ const RoomInfo2 = props => {
      onRefresh = ()=>{
 
          this.setState({
-             refreshing:true,
+             refreshing:true,noData:false,pages:1,
          },()=>{
              this.getBuyerOrder()
              this.getSellerOrder()
@@ -710,14 +710,19 @@ const RoomInfo2 = props => {
                     {
                         handelMsg.map((item,index)=>
 
-                            <LinearGradient key={index} colors={[!item.flag?'#f96f59':"#fff", !item.flag?'#f94939':"#fff"]} style={{width:"50%",}}>
+                            <LinearGradient key={index} colors={[item.flag?'#f96f59':"#fff", item.flag?'#f94939':"#fff"]} style={{width:"50%",}}>
                                 <TouchableHighlight   onPress={()=>this.handelMsg(item)} style={{padding:10,alignItems:"center",
                                     // backgroundColor:!item.flag?"#f6f8fa":"#fff",
                                     borderBottomWidth:1,
                                     borderBottomColor:"#f96f59",
                                 }} underlayColor="transparent" >
 
-                                    <Text style={{color:!item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    <View style={{alignItems:"center",flexDirection:"row"}}>
+                                        {
+                                            item.flag&&<Image source={select} style={{width:14,height:14,marginRight:5}}/>
+                                        }
+                                        <Text style={{color:item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    </View>
                                 </TouchableHighlight>
                             </LinearGradient>
                         )

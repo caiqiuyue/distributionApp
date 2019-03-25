@@ -8,15 +8,18 @@ import axios from "../../axios";
 import moment from "moment/moment";
 import {Toast,Picker,Carousel} from 'antd-mobile'
 import topBg from "../HomePage/style/topBg.png";
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
-import {getData} from "../../components/active/reducer";
 import s1 from "../HomePage/style/234.png";
 import close from "../HomePage/style/close.png";
 import LinearGradient from 'react-native-linear-gradient';
 import TabHome from "../HomePage/homepageBox";
 import add from "../GoodSelect/style/add.png";
 import AddPic from "../GoodSelect/buyers/addPic";
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import { setRoleStr} from '../../components/active/reducer';
+import select from '../select.png';
+import {ifIphoneX} from "react-native-iphone-x-helper";
+
 const setDate = (date) => {
 
     let a = 1000*60;//分钟
@@ -80,8 +83,11 @@ class ReadMessage extends React.Component {
             unreadData:[],
             readData:[],
             aa:false,
+            priceFlag:false,
+
             padd:10,
             pages:1,
+            role:this.props.reduxData.roleStr,
             noData:false,
             orderStatus:[
 
@@ -91,12 +97,12 @@ class ReadMessage extends React.Component {
                 },
 
                 {
-                    label:"只看求买",
+                    label:"只看求货",
                     value:'1'
                 },
 
                 {
-                    label:"只看求卖",
+                    label:"只看出货",
                     value:'2'
                 },
 
@@ -133,7 +139,7 @@ class ReadMessage extends React.Component {
 
         let data = {
             current:1,
-            pageSize:10
+            pageSize:50
         }
 
         if(item){
@@ -258,7 +264,7 @@ class ReadMessage extends React.Component {
             },()=>{
                 axios.post(`/notice/getTradeMarketList`, {
                     current:this.state.pages,
-                    pageSize:10
+                    pageSize:50
                 })
                     .then((response) =>{
                         console.log(response);
@@ -303,7 +309,8 @@ class ReadMessage extends React.Component {
     onRefresh = () => {
 
         this.setState({
-            refreshing: true
+            refreshing: true,
+            noData:false,pages:1
         },()=>{
            this.getTradeMarketList()
            this.getPublishList()
@@ -398,10 +405,6 @@ class ReadMessage extends React.Component {
             return
         }
 
-        if(!content || content.trim()==''){
-            alert('请输入描述内容')
-            return
-        }
 
         let data=new FormData();
         data.append('price',price-0)
@@ -476,6 +479,41 @@ class ReadMessage extends React.Component {
             padd:300,
         })
 
+    }
+
+    setGoodsNo = (goodsNo)=>{
+        let price = ''
+        let priceFlag = false
+
+        axios.get(`/goods/getGoodsBaseByNo`,
+            {goodsNo}
+        )
+            .then((response) =>{
+                console.log(response);
+                if(response.data.code==0){
+                    if(response.data.data.goods){
+                        price = response.data.data.goods.marketPrice+''
+                        priceFlag = true
+                    }else {
+                        price = ''
+                        priceFlag = false
+                    }
+
+                }
+
+                this.setState({
+                    price,priceFlag
+                },()=>{
+                    console.log(this.state.price,'pricepriceprice');
+                })
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+
+        this.setState({
+            goodsNo,
+        })
 
     }
 
@@ -492,6 +530,8 @@ class ReadMessage extends React.Component {
                 overflow:"hidden"}
             : null;
 
+        const {roleStr} = this.props.reduxData;
+
         return (
 
             <View style={{height: Dimensions.get("window").height,backgroundColor:"#fff"}}>
@@ -504,14 +544,18 @@ class ReadMessage extends React.Component {
                     {
                         handelMsg.map((item,index)=>
 
-                            <LinearGradient key={index} colors={[!item.flag?'#f96f59':"#fff", !item.flag?'#f94939':"#fff"]} style={{width:"50%",}}>
+                            <LinearGradient key={index} colors={[item.flag?'#f96f59':"#fff", item.flag?'#f94939':"#fff"]} style={{width:"50%"}}>
                                 <TouchableHighlight   onPress={()=>this.handelMsg(item)} style={{padding:10,alignItems:"center",
-                                    // backgroundColor:!item.flag?"#f6f8fa":"#fff",
                                     borderBottomWidth:1,
                                     borderBottomColor:"#f96f59",
                                 }} underlayColor="transparent" >
 
-                                    <Text style={{color:!item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    <View style={{alignItems:"center",flexDirection:"row"}}>
+                                        {
+                                            item.flag&&<Image source={select} style={{width:14,height:14,marginRight:5}}/>
+                                        }
+                                        <Text style={{color:item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    </View>
                                 </TouchableHighlight>
                             </LinearGradient>
                         )
@@ -535,7 +579,7 @@ class ReadMessage extends React.Component {
                                 <View>
                                     <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
 
-                                        <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看图片'?'查看图片':'信息发布'}</Text></View>
+                                        <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看图片'?'查看图片':`${this.state.role==1?'求货':''}信息发布`}</Text></View>
 
 
 
@@ -587,12 +631,13 @@ class ReadMessage extends React.Component {
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={this.state.goodsNo?this.state.goodsNo:'请填写商品货号'}
-                                                                    style={styles.teCor}
+                                                                    style={[styles.teCor,{backgroundColor:!this.publish?"#fff":"#f0f0f0"}]}
                                                                     editable={!this.publish}
                                                                     underlineColorAndroid="transparent"
                                                                     value={this.state.goodsNo}
+                                                                    autoCapitalize={'none'}
                                                                     // onFocus={this.focus}
-                                                                    onChangeText={(goodsNo) => this.setState({goodsNo})}
+                                                                    onChangeText={(goodsNo) => this.setGoodsNo(goodsNo)}
                                                                 />
                                                             </View>
                                                         </View>
@@ -602,10 +647,11 @@ class ReadMessage extends React.Component {
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={this.state.model?this.state.model:'请填写商品型号'}
-                                                                    style={styles.teCor}
                                                                     editable={!this.publish}
+                                                                    style={[styles.teCor,{backgroundColor:!this.publish?"#fff":"#f0f0f0"}]}
                                                                     underlineColorAndroid="transparent"
                                                                     value={this.state.model}
+                                                                    autoCapitalize={'none'}
                                                                     // onFocus={this.focus}
                                                                     onChangeText={(model) => this.setState({model})}
                                                                 />
@@ -617,9 +663,9 @@ class ReadMessage extends React.Component {
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={this.publish?this.state.price+'':'请填写商品价格'}
-                                                                    style={styles.teCor}
                                                                     placeholderTextColor={this.publish?"#000":'#ccc'}
-                                                                    editable={!this.publish}
+                                                                    editable={!(this.publish || this.state.priceFlag)}
+                                                                    style={[styles.teCor,{backgroundColor:!(this.publish || this.state.priceFlag)?"#fff":"#f0f0f0"}]}
                                                                     underlineColorAndroid="transparent"
                                                                     value={this.state.price}
                                                                     onFocus={this.focus}
@@ -630,12 +676,12 @@ class ReadMessage extends React.Component {
                                                         </View>
 
                                                         <View style={styles.a}>
-                                                            <Text style={styles.f}>数量:</Text>
+                                                            <Text style={styles.f}>{this.state.role==1?'数量':'库存'}:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
-                                                                    placeholder={this.publish?this.state.saleNum+'':'请填写商品数量'}
+                                                                    placeholder={this.publish?this.state.saleNum+'':`请填写商品${this.state.role==1?'数量':'库存'}`}
                                                                     placeholderTextColor={this.publish?"#000":'#ccc'}
-                                                                    style={styles.teCor}
+                                                                    style={[styles.teCor,{backgroundColor:!this.publish?"#fff":"#f0f0f0"}]}
                                                                     underlineColorAndroid="transparent"
                                                                     value={this.state.saleNum}
                                                                     onFocus={this.focus}
@@ -647,11 +693,11 @@ class ReadMessage extends React.Component {
                                                         </View>
 
                                                         <View style={styles.a}>
-                                                            <Text style={styles.f}><Text style={{color:"red"}}>*</Text>描述:</Text>
+                                                            <Text style={styles.f}>描述:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={this.state.content?this.state.content:'请填写描述内容'}
-                                                                    style={[styles.teCor,{height:100}]}
+                                                                    style={[styles.teCor,{backgroundColor:!this.publish?"#fff":"#f0f0f0"}]}
                                                                     placeholderTextColor={this.publish?"#000":'#ccc'}
                                                                     multiline={true}
                                                                     editable={!this.publish}
@@ -689,8 +735,8 @@ class ReadMessage extends React.Component {
                                                             <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
 
 
-                                                                <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
-                                                                    <TouchableHighlight onPress={()=>{this.saveTradeMarket()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center"}}>
+                                                                    <TouchableHighlight onPress={()=>{this.saveTradeMarket()}} underlayColor="transparent" style={{width:100,padding:10,alignItems:"center",justifyContent:"center",}}>
                                                                         <Text style={{color:"#fff"}}>发布</Text>
                                                                     </TouchableHighlight>
                                                                 </LinearGradient>
@@ -755,7 +801,12 @@ class ReadMessage extends React.Component {
                                     // paddingBottom:270,
                                     paddingBottom:230,
                                 }
-                            }),}}>
+                            }),
+
+                            ...ifIphoneX({
+                                paddingBottom:270,
+                            })
+                        }}>
 
                             <View style={{width:"40%",marginTop:5}}>
                                 <Picker
@@ -772,10 +823,11 @@ class ReadMessage extends React.Component {
                                 <FlatList
                                     data={unreadData}  //列表的渲染数据源
                                     ListEmptyComponent={()=><View style={{marginTop:30,alignItems:"center"}}><Text>{this.state.aa?'暂无数据':'获取交易大厅数据中'}</Text></View>} //列表没有数据时展示，箭头函数中可以写一个react组件
+                                    ListFooterComponent={this.state.noData?()=><View style={{marginTop:10,alignItems:"center"}}><Text>到底啦</Text></View>:null} //列表没有数据时展示，箭头函数中可以写一个react组件
                                     getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
                                     initialNumToRender={10}  //首次渲染的条数
                                     onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
-                                    onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
+                                    onEndReachedThreshold={0.7} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
                                     onRefresh={this.onRefresh} //下拉刷新
                                     refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
                                     keyExtractor={(item,index)=>`${index}`}
@@ -788,7 +840,7 @@ class ReadMessage extends React.Component {
                                                 </View>
                                             </View>
                                             <View style={{flex:4}}>
-                                                <View  style={{flexDirection:"row"}}><Text style={{fontWeight:"bold",color:"#606792",marginRight:10,}}>{item.userName}</Text><Text>{item.type==1?'(求买)':'(求卖)'}</Text></View>
+                                                <View><Text style={{fontWeight:"bold",color:"#606792",}}>{item.type==1?'(求货)':'(出货)'}</Text></View>
                                                 <View style={{marginTop:5}}><Text style={{fontWeight:"bold"}}>{item.content}</Text></View>
                                                 <View style={{marginTop:5}}><Text style={{color:"grey"}}>{`尺码:${item.model}, 价格:${item.price}, 货号:${item.goodsNo}, 数量:${item.saleNum}`}</Text></View>
 
@@ -807,7 +859,7 @@ class ReadMessage extends React.Component {
                                                     <View>
 
                                                         {
-                                                            (global.roleStr==1&&item.type==2)&&
+                                                            (roleStr==1&&item.type==2)&&
                                                             <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
                                                                 <TouchableHighlight onPress={()=>{this.getSearchShop(item)}} underlayColor="transparent" style={{width:100,padding:5,borderRadius:5,alignItems:"center",justifyContent:"center",}}>
                                                                     <Text style={{color:"#fff"}}>立即购买</Text>
@@ -816,7 +868,7 @@ class ReadMessage extends React.Component {
                                                         }
 
                                                         {
-                                                            (global.roleStr==2&&item.type==1)&&
+                                                            (roleStr==2&&item.type==1)&&
                                                             <View>
                                                                 <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
                                                                     <TouchableHighlight onPress={()=>{this.uploadItem(item)}} underlayColor="transparent" style={{width:100,padding:5,borderRadius:5,alignItems:"center",justifyContent:"center",}}>
@@ -833,7 +885,7 @@ class ReadMessage extends React.Component {
 
                                                 </View>
                                                 {
-                                                    (global.roleStr == 2 && item.type == 1) &&
+                                                    (roleStr == 2 && item.type == 1) &&
                                                     <Text style={{
                                                         color: "grey",
                                                         textAlign: "right",marginTop:5
@@ -866,7 +918,7 @@ class ReadMessage extends React.Component {
                                     getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
                                     initialNumToRender={10}  //首次渲染的条数
                                     // onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
-                                    onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
+                                    onEndReachedThreshold={0.5} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
                                     onRefresh={this.onRefresh} //下拉刷新
                                     refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
                                     keyExtractor={(item,index)=>`${index}`}
@@ -931,6 +983,6 @@ const styles = StyleSheet.create({
 
 export default connect (
     state => ({reduxData: state.reduxData}),
-    dispath => bindActionCreators({getData},dispath)
+    dispath => bindActionCreators({setRoleStr},dispath)
 )(ReadMessage)
 

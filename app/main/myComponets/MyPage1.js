@@ -132,7 +132,7 @@ export default class App extends React.Component {
                     {
                         goodsNo:this.state.goodsName,
                         current:this.state.pages,
-                        pageSize:10,
+                        pageSize:50,
                     },
 
                 )
@@ -355,7 +355,7 @@ export default class App extends React.Component {
             {
                 goodsNo:this.state.goodsName,
                 current:1,
-                pageSize:10,
+                pageSize:50,
             },
 
         )

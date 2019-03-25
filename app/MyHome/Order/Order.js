@@ -2,8 +2,11 @@ import React,{Component} from 'react';
 import {View, Text,Dimensions} from 'react-native';
 import Order1 from './buyers/Order'
 import Order2 from './seller/Order'
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {getData, setRoleStr} from '../../components/active/reducer';
 
-export default class MineBox extends Component {
+class MineBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -18,11 +21,11 @@ export default class MineBox extends Component {
 
 
     render(){
-
+        const {roleStr} = this.props.reduxData;
         return (
             <View style={{}}>
                 {
-                    global.roleStr == 1 ? (
+                    roleStr == 1 ? (
                         <Order1   navigation={this.props.navigation}/>
                     ) : (
                         <Order2  navigation={this.props.navigation}/>
@@ -35,3 +38,7 @@ export default class MineBox extends Component {
 
 
 
+export default connect (
+    state => ({reduxData: state.reduxData}),
+    dispath => bindActionCreators({getData, setRoleStr},dispath)
+)(MineBox);

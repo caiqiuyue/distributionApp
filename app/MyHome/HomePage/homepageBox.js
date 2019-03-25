@@ -1,13 +1,13 @@
 import React,{Component} from 'react';
-import {View, Text,Dimensions} from 'react-native';
+import {View, Text,Platform} from 'react-native';
 import HomePage1 from './buyers/homePage'
 import HomePage2 from './seller/homePage'
 import axios from "../../axios";
 import {Toast} from "antd-mobile/lib/index";
-// import Dimensions from 'Dimensions';
+import JPushModule from 'jpush-react-native';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {getData} from '../../components/active/reducer';
+import {getData, setRoleStr} from '../../components/active/reducer';
 
 class MineBox extends Component {
     constructor(props) {
@@ -37,16 +37,56 @@ class MineBox extends Component {
     componentWillMount() {
         this.getMyMsg();
         global.stopMsgTime = setInterval(this.getMyMsg, 300000);
+        if(!this.props.reduxData.roleStr) {
+            this.props.setRoleStr(global.roleStr);
+        }
     }
-    
+
+
+    componentDidMount() {
+
+        console.log('componentDidMount');
+
+        const { navigate } = this.props.navigation;
+
+        if(Platform.OS === 'android'){
+            JPushModule.notifyJSDidLoad(resultCode=>console.log(resultCode))//报错
+        }
+
+
+        JPushModule.addReceiveCustomMsgListener((message) => {
+            console.warn(message);
+        });
+        JPushModule.addReceiveNotificationListener((message) => {
+            console.warn("receive notification: " + message);
+        });
+
+        JPushModule.addReceiveOpenNotificationListener((map) => {
+            navigate('Message',{ user:"" })
+
+        })
+    }
+
+
+
+
+
+    componentWillUnmount() {
+
+        JPushModule.removeReceiveCustomMsgListener();
+
+        JPushModule.removeReceiveNotificationListener();
+
+    }
+
 
 
     render(){
-        
+        const {roleStr} = this.props.reduxData;
         return (
             <View style={{}}>
                 {
-                    global.roleStr == 1 ? (
+                    roleStr == 1 ? (
                         <HomePage1   navigation={this.props.navigation}/>
                     ) : (
                         <HomePage2  navigation={this.props.navigation}/>
@@ -61,5 +101,5 @@ class MineBox extends Component {
 
 export default connect (
     state => ({reduxData: state.reduxData}),
-    dispath => bindActionCreators({getData},dispath)
+    dispath => bindActionCreators({getData, setRoleStr},dispath)
 )(MineBox);

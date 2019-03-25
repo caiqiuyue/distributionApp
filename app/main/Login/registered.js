@@ -463,6 +463,7 @@ export default class Login extends Component {
                                                         placeholder="请输入用户名"
                                                         style={{minWidth:300,padding:5}}
                                                         onFocus={this.focus}
+                                                        autoCapitalize={'none'}
                                                         underlineColorAndroid="transparent"
                                                         onChangeText={(userName) => this.handleuserNameChange(userName)}
                                                     >
@@ -480,6 +481,7 @@ export default class Login extends Component {
                                                         style={{minWidth:300,padding:5}}
                                                         secureTextEntry={passwordT?true:false}
                                                         underlineColorAndroid="transparent"
+                                                        autoCapitalize={'none'}
                                                         onFocus={this.focus}
                                                         onChangeText={(passwordType) => this.handlePasswordChange(passwordType)}
                                                     >
@@ -503,6 +505,7 @@ export default class Login extends Component {
                                                             placeholder="请输入验证码"
                                                             style={{minWidth:100,padding:5}}
                                                             underlineColorAndroid="transparent"
+                                                            autoCapitalize={'none'}
                                                             onFocus={this.focus}
                                                             onChangeText={(code) => this.setState({code})}
                                                         >
@@ -511,7 +514,7 @@ export default class Login extends Component {
                                                 </View>
 
                                                 <TouchableHighlight style={{justifyContent:'center',flex:2,}} underlayColor="transparent" onPress={this.changeCode}>
-                                                    <Image style={{resizeMode:"stretch",width:'100%',height:30}} source={{uri:codeData.image}}/>
+                                                    <Image style={{resizeMode:"stretch",width:'100%',height:40}} source={{uri:codeData.image}}/>
                                                 </TouchableHighlight>
                                             </View>
 
@@ -577,6 +580,7 @@ export default class Login extends Component {
                                                         style={{minWidth:300,padding:5}}
                                                         onFocus={this.focus}
                                                         underlineColorAndroid="transparent"
+                                                        autoCapitalize={'none'}
                                                         onChangeText={(realName) => this.setState({realName})}
                                                     >
                                                     </TextInput>
@@ -591,7 +595,7 @@ export default class Login extends Component {
                                                         placeholder="请输入店铺链接"
                                                         style={{minWidth:300,padding:5}}
                                                         onFocus={this.focus}
-                                                        keyboardType='numeric'
+                                                        autoCapitalize={'none'}
                                                         underlineColorAndroid="transparent"
                                                         onChangeText={(companyPhone) => this.setState({companyPhone})}
                                                     >
@@ -607,7 +611,7 @@ export default class Login extends Component {
                                                         placeholder="请输入邮箱地址"
                                                         style={{minWidth:300,padding:5}}
                                                         onFocus={this.focus}
-                                                        keyboardType='numeric'
+                                                        autoCapitalize={'none'}
                                                         underlineColorAndroid="transparent"
                                                         onChangeText={(email) => this.setState({email})}
                                                     >

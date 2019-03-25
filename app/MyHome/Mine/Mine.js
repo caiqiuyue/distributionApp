@@ -12,7 +12,11 @@ import {Toast} from "antd-mobile";
 import LinearGradient from 'react-native-linear-gradient';
 import axios from "../../axios";
 
-export default class Mine extends React.Component {
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {setRoleStr} from '../../components/active/reducer';
+
+class Mine extends React.Component {
     constructor(props) {
         super(props);
         this.state={
@@ -108,14 +112,53 @@ export default class Mine extends React.Component {
             })
     }
 
+    changeRole=()=>{
+        let data = {
+            isApp: 1,
+            role: global.roleStr == 1 ? 2 : 1
+        }
+        axios.get(`/user/changeUserRole`,data,
+        )
+            .then((response) =>{
+                console.log(response);
+
+                if(response.data.code==0){
+                    global.roleStr = data.role;
+                    console.log('2313123213123123123',data.role);
+                    Toast.info(`切换${data.role==1?'买家':'卖家'}成功`)
+                    this.props.setRoleStr(data.role);
+                    storage.load({ //读取tokenKey
+                        key: 'username',
+                        autoSync: false
+                    }).then(ret => {
+                        ret.roleStr = data.role;
+
+                        storage.save({
+                            key: 'username',  // 注意:请不要在key中使用_下划线符号!
+                            //data是你想要存储在本地的storage变量，这里的data只是一个示例。如果你想存一个叫item的对象，那么可以data: item，这样使用
+                            data:ret,
+                            // 如果不指定过期时间，则会使用defaultExpires参数
+                            // 如果设为null，则永不过期
+                            expires: null
+                        });
+                    }).catch((error) => {
+                    });
+                }else {
+                    Toast.info(response.data.message)
+                }
+
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
 
     render(){
-
-
+        const {roleStr} = this.props.reduxData;
         return (
 
             <View style={{height:Dimensions.get("window").height}}>
-
 
                 <View>
 
@@ -135,12 +178,13 @@ export default class Mine extends React.Component {
                         <View style={{flex:2,marginLeft:10,justifyContent:"center"}}>
 
 
-                            <View  style={{flexDirection:"row"}}>
+                            <View  style={{flexDirection:"row",justifyContent:"space-between"}}>
                                 <Text style={{marginRight:50}}>{this.state.userInfo.realName}</Text>
+                                <TouchableHighlight underlayColor="transparent" onPress={this.changeRole}><Text style={{textDecorationLine:'underline'}}>切换到{roleStr == 1?'卖家':'买家'}</Text></TouchableHighlight>
 
                             </View>
                             <View style={{marginTop:10}}>
-                                <Text style={{}}>{global.roleStr == 1?'我是买家':'我是卖家'}</Text>
+                                <Text style={{}}>{roleStr == 1?'我是买家':'我是卖家'}</Text>
                             </View>
                         </View>
 
@@ -207,6 +251,11 @@ export default class Mine extends React.Component {
 
     }
 }
+
+export default connect (
+    state => ({reduxData: state.reduxData}),
+    dispath => bindActionCreators({setRoleStr},dispath)
+)(Mine);
 
 
 const styles = StyleSheet.create({

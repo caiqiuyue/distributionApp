@@ -5,8 +5,11 @@ import GoodSelect2 from './seller/GoodSelect'
 import axios from "../../axios";
 import {Toast} from "antd-mobile/lib/index";
 // import Dimensions from 'Dimensions';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {getData, setRoleStr} from '../../components/active/reducer';
 
-export default class MineBox extends Component {
+class MineBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -21,11 +24,12 @@ export default class MineBox extends Component {
 
 
     render(){
+        const {roleStr} = this.props.reduxData;
 
         return (
             <View style={{}}>
                 {
-                    global.roleStr == 1 ? (
+                    roleStr == 1 ? (
                         <GoodSelect1   navigation={this.props.navigation}/>
                     ) : (
                         <GoodSelect2  navigation={this.props.navigation}/>
@@ -36,5 +40,9 @@ export default class MineBox extends Component {
     }
 }
 
+export default connect (
+    state => ({reduxData: state.reduxData}),
+    dispath => bindActionCreators({setRoleStr},dispath)
+)(MineBox);
 
 

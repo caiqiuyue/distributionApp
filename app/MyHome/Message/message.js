@@ -5,7 +5,7 @@ import MessageContent from './messageContent'
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {getData} from "../../components/active/reducer";
+import {getData, setRoleStr} from "../../components/active/reducer";
 
 
 class Message extends Component {

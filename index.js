@@ -23,12 +23,12 @@ storage.load({ //读取tokenKey
     autoSync: false
 }).then(ret => {
     global.roleStr = ret.roleStr;
-    global.realname = ret.realname;
-    global.password = ret.password;
+    // global.realname = ret.realname;
+    // global.password = ret.password;
 }).catch((error) => {
     global.roleStr = null;
-    global.realname = null;
-    global.password = null;
+    // global.realname = null;
+    // global.password = null;
 });
 
 const store = configureStore();

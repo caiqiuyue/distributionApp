@@ -16,7 +16,8 @@ class Detail extends Component {
         let data = {
             id: modelArr.length,
             stock: null,
-            name: null
+            name: null,
+            salePrice: this.props.salePrice || null
         };
         modelArr.push(data);
         this.setState({modelArr})
@@ -57,6 +58,19 @@ class Detail extends Component {
         },()=>{this.props.addModel(this.state.modelArr)})
     }
 
+    setPrice = (salePrice,id)=>{
+        let {modelArr} = this.state;
+        modelArr.map(item=>{
+            if(item.id==id){
+                item.salePrice = salePrice
+            }
+        })
+
+        this.setState({
+            modelArr
+        },()=>{this.props.addModel(this.state.modelArr)})
+    }
+
     render() {
 
         let {modelArr} = this.state;
@@ -80,6 +94,7 @@ class Detail extends Component {
                                 <TextInput
                                     placeholder={item.name?item.name:'商品型号'}
                                     style={styles.teCor}
+                                    autoCapitalize={'none'}
                                     underlineColorAndroid="transparent"
                                     onChangeText={(name) => this.setName(name,item.id)}
                                 />
@@ -88,8 +103,19 @@ class Detail extends Component {
                                 <TextInput
                                     placeholder={item.stock?item.stock:'商品数量'}
                                     style={styles.teCor}
+                                    keyboardType={'numeric'}
                                     underlineColorAndroid="transparent"
                                     onChangeText={(stock) => this.setStock(stock,item.id)}
+                                />
+                            </View>
+                            <View style={[styles.b,{flex:3}]}>
+                                <TextInput
+                                    placeholder={'商品价格'}
+                                    style={styles.teCor}
+                                    keyboardType={'numeric'}
+                                    value={item.salePrice}
+                                    underlineColorAndroid="transparent"
+                                    onChangeText={(salePrice) => this.setPrice(salePrice,item.id)}
                                 />
                             </View>
                             <TouchableHighlight style={{flex:1,alignItems:"center",justifyContent:"center"}} underlayColor="transparent" onPress={() => this.handleDeleteItem(item.id)}>

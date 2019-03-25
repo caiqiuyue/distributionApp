@@ -16,8 +16,9 @@ import {getData} from "../../components/active/reducer";
 
 import read from './style/read.png'
 import unread from './style/unread.png'
+import select from '../select.png'
 import LinearGradient from 'react-native-linear-gradient';
-
+import {ifIphoneX} from "react-native-iphone-x-helper";
 const setDate = (date) => {
 
     let a = 1000*60;//分钟
@@ -157,8 +158,9 @@ class ReadMessage extends React.Component {
     //点击标为已读
     messageBtn = (item)=>{
 
-        axios.post(`/empMsg/updateMyMsg`, {
-            id:item.id
+        axios.get(`/notice/updateMessage`, {
+            id:item.id,
+            status:1,
         })
             .then( (response)=> {
                 console.log(response);
@@ -264,7 +266,7 @@ class ReadMessage extends React.Component {
     onRefresh = () => {
 
         this.setState({
-            refreshing: true
+            refreshing: true,noData:false,pages:1,
         },()=>{
            this.getMyMsg()
         });
@@ -304,14 +306,19 @@ class ReadMessage extends React.Component {
                     {
                         handelMsg.map((item,index)=>
 
-                            <LinearGradient key={index} colors={[!item.flag?'#f96f59':"#fff", !item.flag?'#f94939':"#fff"]} style={{width:"50%",}}>
+                            <LinearGradient key={index} colors={[item.flag?'#f96f59':"#fff", item.flag?'#f94939':"#fff"]} style={{width:"50%",}}>
                                 <TouchableHighlight   onPress={()=>this.handelMsg(item)} style={{padding:10,alignItems:"center",
                                     // backgroundColor:!item.flag?"#f6f8fa":"#fff",
                                     borderBottomWidth:1,
                                     borderBottomColor:"#f96f59",
                                 }} underlayColor="transparent" >
 
-                                    <Text style={{color:!item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    <View style={{alignItems:"center",flexDirection:"row"}}>
+                                        {
+                                            item.flag&&<Image source={select} style={{width:14,height:14,marginRight:5}}/>
+                                        }
+                                        <Text style={{color:item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    </View>
                                 </TouchableHighlight>
                             </LinearGradient>
                         )
@@ -322,7 +329,22 @@ class ReadMessage extends React.Component {
                 {
                     changeMsg=='未读消息'?
                         <View>
-                            <View style={{height: Dimensions.get("window").height-130,padding:10}}>
+                            <View style={{padding:10,
+                                ...ifIphoneX({
+                                    height: Dimensions.get("window").height-180
+                                }),
+                                ...Platform.select({
+                                    android:{
+                                        height: Dimensions.get("window").height-180,
+                                    },
+                                    ios:{
+                                        height: Dimensions.get("window").height-140,
+                                    },
+
+                                }),
+
+
+                            }}>
                                 <FlatList
                                     data={unreadData}  //列表的渲染数据源
                                     ListEmptyComponent={()=><View style={{marginTop:30,alignItems:"center"}}><Text>{this.state.aa?'暂无未读消息':'获取消息数据中'}</Text></View>} //列表没有数据时展示，箭头函数中可以写一个react组件
@@ -361,7 +383,7 @@ class ReadMessage extends React.Component {
                                                         </Text>
                                                     </TouchableHighlight>
 
-                                                    {/*<TouchableHighlight  underlayColor={item.sendStatus==1 ? "#f0f0f0":'#fff'} onPress={()=>this.messageBtn(item)}><Text  style={{color:"#ef7f92",textAlign:"right"}}>标为已读</Text></TouchableHighlight>*/}
+                                                    <TouchableHighlight  underlayColor={item.sendStatus==1 ? "#f0f0f0":'#fff'} onPress={()=>this.messageBtn(item)}><Text  style={{color:"blue",textAlign:"right"}}>标为已读</Text></TouchableHighlight>
 
                                                 </View>
                                             </View>

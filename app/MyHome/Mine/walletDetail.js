@@ -9,7 +9,7 @@ import {Picker,DatePicker,Toast} from 'antd-mobile'
 import axios from "../../axios";
 import moment from "moment";
 import LinearGradient from 'react-native-linear-gradient';
-
+import select from '../select.png'
 
 export default class GoodSelect extends Component {
     constructor(props) {
@@ -71,7 +71,7 @@ export default class GoodSelect extends Component {
          axios.post(`/account/searchRechargeBill`,
              {
                  current:1,
-                 pageSize:10,
+                 pageSize:50,
 
              },
 
@@ -118,7 +118,7 @@ export default class GoodSelect extends Component {
          axios.post(`/account/searchWithdrawBill`,
              {
                  current:1,
-                 pageSize:10,
+                 pageSize:50,
 
              },
 
@@ -181,7 +181,7 @@ export default class GoodSelect extends Component {
                      axios.post(`/account/searchRechargeBill`,
                          {
                              current:this.state.pages1,
-                             pageSize:10,
+                             pageSize:50,
                          },
 
                      )
@@ -197,7 +197,7 @@ export default class GoodSelect extends Component {
 
                                      if(response.data.data.rechargeList.length==0){
                                          this.setState({
-                                             noData2:true
+                                             noData1:true
                                          })
                                      }else{
                                          this.setState({
@@ -229,7 +229,7 @@ export default class GoodSelect extends Component {
                      axios.post(`/account/searchWithdrawBill`,
                          {
                              current:this.state.pages1,
-                             pageSize:10,
+                             pageSize:50,
                          },
 
                      )
@@ -279,7 +279,7 @@ export default class GoodSelect extends Component {
      onRefresh = ()=>{
 
          this.setState({
-             refreshing:true,
+             refreshing:true,noData:false,noData2:false,pages1:1,pages2:1,
          },()=>{
              this.searchRechargeBill()
              this.searchWithdrawBill()
@@ -309,14 +309,19 @@ export default class GoodSelect extends Component {
                     {
                         handelMsg.map((item,index)=>
 
-                            <LinearGradient key={index} colors={[!item.flag?'#f96f59':"#fff", !item.flag?'#f94939':"#fff"]} style={{width:"50%",}}>
+                            <LinearGradient key={index} colors={[item.flag?'#f96f59':"#fff", item.flag?'#f94939':"#fff"]} style={{width:"50%",}}>
                                 <TouchableHighlight   onPress={()=>this.handelMsg(item)} style={{padding:10,alignItems:"center",
                                     // backgroundColor:!item.flag?"#f6f8fa":"#fff",
                                     borderBottomWidth:1,
                                     borderBottomColor:"#f96f59",
                                 }} underlayColor="transparent" >
 
-                                    <Text style={{color:!item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    <View style={{alignItems:"center",flexDirection:"row"}}>
+                                        {
+                                            item.flag&&<Image source={select} style={{width:14,height:14,marginRight:5}}/>
+                                        }
+                                        <Text style={{color:item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    </View>
                                 </TouchableHighlight>
                             </LinearGradient>
                         )

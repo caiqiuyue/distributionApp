@@ -5,8 +5,8 @@ import {
     TextInput,
     StyleSheet,
     TouchableHighlight,
-    View,Dimensions,
-    FlatList,Modal,ScrollView,Image,DeviceEventEmitter
+    View, Dimensions,
+    FlatList, Modal, ScrollView, Image, DeviceEventEmitter, Platform
 
 } from 'react-native';
 
@@ -20,6 +20,7 @@ import search from "../style/search.png";
 import cart from "../style/cart.png";
 import deleteIcon from  '../../GoodSelect/style/delete.png'
 import s1 from "../style/234.png";
+import {ifIphoneX} from "react-native-iphone-x-helper";
 const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
@@ -176,7 +177,7 @@ export default class App extends React.Component {
                     {
                         goodsNo:this.state.goodsName,
                         current:this.state.pages,
-                        pageSize:10,
+                        pageSize:20,
                         orderByType:this.state.orderStatu[0]
                     },
 
@@ -390,6 +391,18 @@ export default class App extends React.Component {
 
     }
 
+    isGoodsPrice=(list, price)=> {
+        let flag = false;
+        if (list) {
+            list.forEach(item=> {
+                if (item.salePrice !== price) {
+                    flag = true;
+                }
+            })
+        }
+        return flag;
+    }
+
 
     //搜索货物
     searchGoods = ()=>{
@@ -399,7 +412,7 @@ export default class App extends React.Component {
             {
                 goodsNo:this.state.goodsName,
                 current:1,
-                pageSize:10,
+                pageSize:20,
                 orderByType:this.state.orderStatu[0]
             },
 
@@ -477,7 +490,8 @@ export default class App extends React.Component {
     onRefresh = ()=>{
 
         this.setState({
-            refreshing:true,
+            refreshing:true,pages:1,
+            noData:false
         },()=>{
             this.searchGoods()
         })
@@ -614,7 +628,7 @@ export default class App extends React.Component {
                     {
                         goodsNo:this.state.goodsName,
                         current:1,
-                        pageSize:10,
+                        pageSize:20,
                         sellerId: getSearchShop.getSearchShop.userId,
                         modelName: getSearchShop.getSearchShop.model,
                         orderByType:this.state.orderStatu[0]
@@ -645,6 +659,10 @@ export default class App extends React.Component {
 
 
         }
+    }
+
+    handelScroll=(event)=>{
+        // console.log(event.nativeEvent.contentOffset.y,'contentOffsetcontentOffsetcontentOffset');
     }
 
     render() {
@@ -749,6 +767,7 @@ export default class App extends React.Component {
                                                                                     placeholder={''}
                                                                                     style={{minWidth:'100%',padding:10,backgroundColor:"#fff",}}
                                                                                     underlineColorAndroid="transparent"
+                                                                                    autoCapitalize={'none'}
                                                                                     value={_item.stockNo+''}
                                                                                     onChangeText={(stockNo) => this.setStockNo(stockNo,_item)}
                                                                                 />
@@ -873,6 +892,7 @@ export default class App extends React.Component {
                                     style={{minWidth:'100%',backgroundColor:"#fff",padding:5}}
                                     underlineColorAndroid="transparent"
                                     value={this.state.goodsName}
+                                    autoCapitalize={'none'}
                                     onChangeText={(goodsName) => this.setState({goodsName})}
                                 />
                             </View>
@@ -913,15 +933,31 @@ export default class App extends React.Component {
                     </TouchableHighlight>
                 </View>
 
-                <View style={{height: Dimensions.get("window").height-150}}>
+                <View style={{
+                    ...Platform.select({
+                        android:{
+                            height: Dimensions.get("window").height-220
+                        },
+                        ios:{
+                            // paddingBottom:270,
+                            height: Dimensions.get("window").height-190
+                            // paddingBottom:200
+                        },
+
+                    }),
+                    ...ifIphoneX({
+                        height: Dimensions.get("window").height-220
+                })
+                    }}>
                     <FlatList
                         data={goodsList}  //列表的渲染数据源
                         ListEmptyComponent={()=><View style={{marginTop:30,alignItems:"center"}}><Text>{this.state.aa?'暂无商品数据':'查询商品中'}</Text></View>} //列表没有数据时展示，箭头函数中可以写一个react组件
                         getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
                         initialNumToRender={10}  //首次渲染的条数
                         onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
-                        onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
+                        onEndReachedThreshold={0.5} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
                         onRefresh={this.onRefresh} //下拉刷新
+                        onScroll={this.handelScroll}
                         refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
                         keyExtractor={(item,index)=>`${index}`}
                         renderItem={({item}) => (  //渲染列表的方式
@@ -995,6 +1031,7 @@ export default class App extends React.Component {
                                                 <View key={index} style={{marginRight:10}}>
                                                     <View style={{width:50,padding:5,alignItems: "center",justifyContent:'center'}}><Text>{_item.stockNum==-1?'有货':_item.stockNum==0?'无货':`剩${_item.stockNum}`}</Text></View>
                                                     <View style={{width:50,padding:5,alignItems: "center",justifyContent:'center',backgroundColor:"#f0f0f0",borderRadius:3}}><Text style={{color:_item.stockNum==0?'grey':"#000"}}>{_item.modelName}</Text></View>
+                                                    {this.isGoodsPrice(item.models,item.salePrice)&&<View style={{width:80,padding:5,}}><Text style={{color:'red'}}>{_item.salePrice}</Text></View>}
                                                 </View>
 
                                             )

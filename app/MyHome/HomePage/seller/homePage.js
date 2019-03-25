@@ -216,7 +216,7 @@ export default class App extends React.Component {
                     {
                         goodsNo:this.state.goodsName,
                         current:this.state.pages,
-                        pageSize:10,
+                        pageSize:50,
                     },
 
                 )
@@ -292,20 +292,20 @@ export default class App extends React.Component {
             return
         }
 
-        if(!season[0]){
-            alert('请选择季节')
-            return
-        }
+        // if(!season[0]){
+        //     alert('请选择季节')
+        //     return
+        // }
 
-        if(!date){
-            alert('请选择上市日期')
-            return
-        }
+        // if(!date){
+        //     alert('请选择上市日期')
+        //     return
+        // }
 
-        if(!category){
-            alert('请填写分类')
-            return
-        }
+        // if(!category){
+        //     alert('请填写分类')
+        //     return
+        // }
 
         if(!marketPrice){
             alert('请填写市场价格')
@@ -354,7 +354,7 @@ export default class App extends React.Component {
             category:category,
             sport:sport,
             color:color,
-            marketTime:moment(date).format('YYYY-MM-DD'),
+            marketTime:date&&moment(date).format('YYYY-MM-DD'),
             marketPrice:marketPrice-0,
             salePrice:salePrice-0,
             modelList:modelList,
@@ -381,7 +381,7 @@ export default class App extends React.Component {
             {
                 goodsNo:this.state.goodsName,
                 current:1,
-                pageSize:10,
+                pageSize:50,
             },
 
         )
@@ -504,7 +504,7 @@ export default class App extends React.Component {
     onRefresh = ()=>{
 
         this.setState({
-            refreshing:true,
+            refreshing:true,noData:false,pages:1,
         },()=>{
             this.searchGoods()
         })
@@ -708,6 +708,7 @@ export default class App extends React.Component {
                                                             <TextInput
                                                                 placeholder={this.state.shelvesGoodsName?this.state.shelvesGoodsName:'请填写商品名称'}
                                                                 style={styles.teCor}
+                                                                placeholderTextColor={this.state.shelvesGoodsName?"#000":'#ccc'}
                                                                 underlineColorAndroid="transparent"
                                                                 onChangeText={(shelvesGoodsName) => this.setState({shelvesGoodsName})}
                                                             />
@@ -719,6 +720,7 @@ export default class App extends React.Component {
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <TextInput
                                                                 placeholder={this.state.brandName?this.state.brandName:'请填写品牌'}
+                                                                placeholderTextColor={this.state.brandName?"#000":'#ccc'}
                                                                 style={styles.teCor}
                                                                 underlineColorAndroid="transparent"
                                                                 onChangeText={(brandName) => this.setState({brandName})}
@@ -742,7 +744,7 @@ export default class App extends React.Component {
                                                     </View>
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>上市日期:</Text>
+                                                        <Text style={styles.f}>上市日期:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <DatePicker
                                                                 extra="请选择日期"
@@ -757,7 +759,7 @@ export default class App extends React.Component {
                                                     </View>
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>季节:</Text>
+                                                        <Text style={styles.f}>季节:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <Picker
                                                                 data={this.state.seasonList}
@@ -778,8 +780,10 @@ export default class App extends React.Component {
                                                                 placeholder={this.state.marketPrice?this.state.marketPrice:'请填写市场价格'}
                                                                 keyboardType={'numeric'}
                                                                 style={styles.teCor}
+                                                                placeholderTextColor={this.state.marketPrice?"#000":'#ccc'}
                                                                 onFocus={this.focus}
                                                                 underlineColorAndroid="transparent"
+                                                                value={this.state.marketPrice}
                                                                 onChangeText={(marketPrice) => this.setState({marketPrice})}
                                                             />
                                                         </View>
@@ -793,6 +797,8 @@ export default class App extends React.Component {
                                                                 keyboardType={'numeric'}
                                                                 onFocus={this.focus}
                                                                 style={styles.teCor}
+                                                                value={this.state.salePrice}
+                                                                placeholderTextColor={this.state.salePrice?"#000":'#ccc'}
                                                                 underlineColorAndroid="transparent"
                                                                 onChangeText={(salePrice) => this.setState({salePrice})}
                                                             />
@@ -823,6 +829,7 @@ export default class App extends React.Component {
                                                                 placeholder={this.state.series?this.state.series:'请填写系列'}
                                                                 onFocus={this.focus}
                                                                 style={styles.teCor}
+                                                                placeholderTextColor={this.state.series?"#000":'#ccc'}
                                                                 underlineColorAndroid="transparent"
                                                                 onChangeText={(series) => this.setState({series})}
                                                             />
@@ -830,12 +837,13 @@ export default class App extends React.Component {
                                                     </View>
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>分类:</Text>
+                                                        <Text style={styles.f}>分类:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <TextInput
                                                                 placeholder={this.state.category?this.state.category:'请填写分类'}
                                                                 onFocus={this.focus}
                                                                 style={styles.teCor}
+                                                                placeholderTextColor={this.state.category?"#000":'#ccc'}
                                                                 underlineColorAndroid="transparent"
                                                                 onChangeText={(category) => this.setState({category})}
                                                             />
@@ -849,6 +857,7 @@ export default class App extends React.Component {
                                                                 placeholder={this.state.sport?this.state.sport:'请填写运动类型'}
                                                                 onFocus={this.focus}
                                                                 style={styles.teCor}
+                                                                placeholderTextColor={this.state.sport?"#000":'#ccc'}
                                                                 underlineColorAndroid="transparent"
                                                                 onChangeText={(sport) => this.setState({sport})}
                                                             />
@@ -865,12 +874,13 @@ export default class App extends React.Component {
                                                                 onFocus={this.focus}
                                                                 style={styles.teCor}
                                                                 underlineColorAndroid="transparent"
+                                                                placeholderTextColor={this.state.color?"#000":'#ccc'}
                                                                 onChangeText={(color) => this.setState({color})}
                                                             />
                                                         </View>
                                                     </View>
 
-                                                    <AddModels addModel={this.addModel}/>
+                                                    <AddModels addModel={this.addModel} salePrice={this.state.salePrice || null} />
 
 
 
@@ -1050,6 +1060,7 @@ export default class App extends React.Component {
                                     placeholder={'请输入货号名'}
                                     style={{minWidth:'100%',backgroundColor:"#fff",padding:5}}
                                     underlineColorAndroid="transparent"
+                                    autoCapitalize={'none'}
                                     onChangeText={(goodsName) => this.setState({goodsName})}
                                 />
                             </View>

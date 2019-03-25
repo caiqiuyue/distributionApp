@@ -16,7 +16,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {setHotelNo} from "../../../components/active/reducer";
 import LinearGradient from 'react-native-linear-gradient';
-
+import select from '../../select.png'
 
  class GoodSelect extends Component {
     constructor(props) {
@@ -40,7 +40,9 @@ import LinearGradient from 'react-native-linear-gradient';
             ],
 
             changeMsg:"待处理",
-            pages:1,
+            pages1:1,
+            pages2:1,
+            pages3:1,
             order1:[],
             order2:[],
             order3:[],
@@ -97,7 +99,7 @@ import LinearGradient from 'react-native-linear-gradient';
          axios.post(`/order/getBuyerOrderService`,
              {
                  current:1,
-                 pageSize:10,
+                 pageSize:50,
                  type:1
              },
 
@@ -131,7 +133,7 @@ import LinearGradient from 'react-native-linear-gradient';
          axios.post(`/order/getBuyerOrderService`,
              {
                  current:1,
-                 pageSize:10,
+                 pageSize:50,
                  type:2
              },
 
@@ -165,7 +167,7 @@ import LinearGradient from 'react-native-linear-gradient';
          axios.post(`/order/getBuyerOrderService`,
              {
                  current:1,
-                 pageSize:10,
+                 pageSize:50,
                  type:3
              },
 
@@ -304,17 +306,17 @@ import LinearGradient from 'react-native-linear-gradient';
 
      //上啦加载
      onEndReached = ()=>{
-         let {pages,order1,order2,order3,noData1,noData2,noData3} = this.state;
+         let {pages1,pages2,pages3,order1,order2,order3,noData1,noData2,noData3} = this.state;
 
 
          if(!noData1){
              this.setState({
-                 pages:pages+1
+                 pages1:pages1+1
              },()=>{
                  axios.post(`/order/getBuyerOrderService`,
                      {
-                         current:this.state.pages,
-                         pageSize:10,
+                         current:this.state.pages1,
+                         pageSize:50,
                          type:1
                      },
 
@@ -355,12 +357,12 @@ import LinearGradient from 'react-native-linear-gradient';
          }
          if(!noData2){
              this.setState({
-                 pages:pages+1
+                 pages2:pages2+1
              },()=>{
                  axios.post(`/order/getBuyerOrderService`,
                      {
-                         current:this.state.pages,
-                         pageSize:10,
+                         current:this.state.pages2,
+                         pageSize:50,
                          type:2
                      },
 
@@ -401,12 +403,12 @@ import LinearGradient from 'react-native-linear-gradient';
          }
          if(!noData3){
              this.setState({
-                 pages:pages+1
+                 pages3:pages3+1
              },()=>{
                  axios.post(`/order/getBuyerOrderService`,
                      {
-                         current:this.state.pages,
-                         pageSize:10,
+                         current:this.state.pages3,
+                         pageSize:50,
                          type:3
                      },
 
@@ -454,7 +456,7 @@ import LinearGradient from 'react-native-linear-gradient';
      onRefresh = ()=>{
 
          this.setState({
-             refreshing:true,
+             refreshing:true,noData1:false,noData2:false,noData3:false,pages1:1,pages2:1,pages3:1,
          },()=>{
              this.getAll()
          })
@@ -486,14 +488,19 @@ import LinearGradient from 'react-native-linear-gradient';
                     {
                         handelMsg.map((item,index)=>
 
-                            <LinearGradient key={index} colors={[!item.flag?'#f96f59':"#fff", !item.flag?'#f94939':"#fff"]} style={{width:"33.33%",}}>
+                            <LinearGradient key={index} colors={[item.flag?'#f96f59':"#fff", item.flag?'#f94939':"#fff"]} style={{width:"33.33%",}}>
                                 <TouchableHighlight   onPress={()=>this.handelMsg(item)} style={{padding:10,alignItems:"center",
                                     // backgroundColor:!item.flag?"#f6f8fa":"#fff",
                                     borderBottomWidth:1,
                                     borderBottomColor:"#f96f59",
                                 }} underlayColor="transparent" >
 
-                                    <Text style={{color:!item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    <View style={{alignItems:"center",flexDirection:"row"}}>
+                                        {
+                                            item.flag&&<Image source={select} style={{width:14,height:14,marginRight:5}}/>
+                                        }
+                                        <Text style={{color:item.flag?"#fff":"#f94939",fontWeight:"bold"}}>{item.value}</Text>
+                                    </View>
                                 </TouchableHighlight>
                             </LinearGradient>
                         )
