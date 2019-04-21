@@ -43,6 +43,8 @@ import select from '../../select.png'
             pages1:1,
             pages2:1,
             pages3:1,
+            postNo:'',
+            postName:'',
             order1:[],
             order2:[],
             order3:[],
@@ -248,7 +250,9 @@ import select from '../../select.png'
          this.setState({
              details: item,
              modalVisible: true,
-             modal:"查看详情"
+             modal:"查看详情",
+             postNo:'',
+             postName:''
 
          })
      }
@@ -256,13 +260,24 @@ import select from '../../select.png'
 
      //填写退货快递单号
      acceptOrder = ()=>{
+
+         if(!this.state.postNo){
+            alert('快递单号不能为空')
+             return
+         }
+
+         if(!this.state.postName){
+             alert('快递名称不能为空')
+             return
+         }
+
          this.setState({
              modalVisible:false
          },()=>{
              axios.post(`/order/buyerReturnGoods`,{
                  serviceId:this.state.details.serviceId,
                  postNo:this.state.postNo,
-                 postName:''
+                 postName:this.state.postName
              },)
                  .then((response) =>{
                      console.log(response);
@@ -553,7 +568,7 @@ import select from '../../select.png'
                                                     <View style={styles.a}>
                                                         <Text style={styles.f}>订单时间:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
-                                                            <Text style={{flex:1}}>{moment(details.createTime).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                                                            <Text style={{flex:1}}>{moment(details.createTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
                                                         </View>
                                                     </View>
 
@@ -589,7 +604,7 @@ import select from '../../select.png'
                                                     </View>
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}>商品型号:</Text>
+                                                        <Text style={styles.f}>商品尺码:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <Text style={{flex:1}}>{details.modelName}</Text>
                                                         </View>
@@ -711,7 +726,7 @@ import select from '../../select.png'
                                                     </View>
                                                 </ScrollView>
 
-                                                {(details.serviceStatus!=0&&!details.postNo)&&
+                                                {(details.processResult==1&&details.processType==1)&&
                                                 <View style={{alignItems:"center",justifyContent:"center",marginTop:20,flexDirection:"row"}}>
 
                                                     <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
@@ -730,6 +745,17 @@ import select from '../../select.png'
                                                 <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
                                                     <View style={{padding:10}}>
 
+                                                        <View style={styles.a}>
+                                                            <Text style={styles.f}>快递名称:</Text>
+                                                            <View style={[styles.b,{flex:3}]}>
+                                                                <TextInput
+                                                                    placeholder={'请填写快递单号'}
+                                                                    style={[{borderColor:"#ccc",borderWidth:1,borderRadius:5,padding:5}]}
+                                                                    underlineColorAndroid="transparent"
+                                                                    onChangeText={(postName) => this.setState({postName})}
+                                                                />
+                                                            </View>
+                                                        </View>
 
                                                         <View style={styles.a}>
                                                             <Text style={styles.f}>快递单号:</Text>

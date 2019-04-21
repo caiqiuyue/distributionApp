@@ -28,6 +28,17 @@ export default class Security extends Component {
         };
     }
 
+    componentWillMount(){
+        const {getParam} = this.props.navigation;
+        const datas = getParam("user");
+        console.log(datas);
+        if(datas=='set'){
+            this.type=2
+            this.setState({
+                visible: true,
+            })
+        }
+    }
 
 
     handleClick = () => {

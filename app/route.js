@@ -3,6 +3,7 @@ import WelcomePage from './main/WelcomePage';
 import Home from './main/Tab/tab';
 import Login from './main/Login/Login';
 import Registered from './main/Login/registered';
+import FindPassword from './main/Login/findPassword';
 import Wallet from './MyHome/Mine/wallet';
 import TopUp from './MyHome/Mine/topUp';
 import Withdrawal from './MyHome/Mine/withdrawal';
@@ -148,6 +149,20 @@ const LoginHome = StackNavigator({
         screen: Registered,
         navigationOptions: {
             headerTitle:'注册',
+            headerBackTitle:null,
+            headerStyle: {
+                backgroundColor: '#f94939'
+            },
+            headerTitleStyle: {
+                color: '#fff'
+            },
+            headerTintColor:"#fff"
+        }
+    },
+    FindPassword:{
+        screen: FindPassword,
+        navigationOptions: {
+            headerTitle:'找回密码',
             headerBackTitle:null,
             headerStyle: {
                 backgroundColor: '#f94939'

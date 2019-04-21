@@ -333,7 +333,7 @@ export default class Message extends Component {
                 <View style={[styles.a,{height:50}]}>
                     <Text style={styles.f}>头像:</Text>
                     <View style={[styles.b,{flex:4}]}>
-                        <TouchableOpacity onPress={this.selectPhotoTapped}>
+                        <View>
                             <View>
                                 { !this.state.image ? (
                                     <View style={{flexDirection: 'row'}}>
@@ -350,7 +350,7 @@ export default class Message extends Component {
                                     </View>
                                 )}
                             </View>
-                        </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
 

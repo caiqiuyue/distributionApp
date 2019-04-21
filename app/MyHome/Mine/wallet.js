@@ -301,7 +301,7 @@ export default class Mine extends React.Component {
 
 
                                                     <View  style={{justifyContent:'center',flex:1,}}>
-                                                        <LinearGradient colors={['#00adfb', '#00618e']} style={{borderRadius:5}}>
+                                                        <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5}}>
                                                             <TouchableHighlight
                                                                 style={{padding:5,alignItems:"center"}}
                                                                 underlayColor="transparent"
@@ -317,7 +317,7 @@ export default class Mine extends React.Component {
                                                 </View>
 
                                                 <View style={{alignItems:"center",marginTop:10}}>
-                                                    <LinearGradient colors={['#00adfb', '#00618e']} style={{width:100,borderRadius:5}}>
+                                                    <LinearGradient colors={['#f96f59', '#f94939']} style={{width:100,borderRadius:5}}>
                                                         <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
                                                             alignItems:"center"
                                                         }} onPress={this.setPayPassword }>

@@ -21,6 +21,7 @@ import cart from "../style/cart.png";
 import deleteIcon from  '../../GoodSelect/style/delete.png'
 import s1 from "../style/234.png";
 import {ifIphoneX} from "react-native-iphone-x-helper";
+import {Toast} from "antd-mobile/lib/index";
 const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
@@ -51,7 +52,7 @@ export default class App extends React.Component {
             transparent: true,//是否透明显示
             goodsItem:{},
             goodsDatas: [],
-            orderStatu: ['asc'],
+            orderStatu: ['desc'],
             orderStatus:[
 
                 {
@@ -314,7 +315,7 @@ export default class App extends React.Component {
                 modalVisible:false
             },()=>{
                 if(this.addCart!=1){
-                    navigate('Pay',{ user: [goodsItem] })
+                    navigate('Pay',{ user: [JSON.parse(JSON.stringify(goodsItem))] })
                 } else {
                     let dataItem = JSON.parse(JSON.stringify(goodsItem));
                     let {goodsDatas} = this.state;
@@ -411,6 +412,7 @@ export default class App extends React.Component {
         axios.post(`/goods/searchGoods`,
             {
                 goodsNo:this.state.goodsName,
+                ifImage:true,
                 current:1,
                 pageSize:20,
                 orderByType:this.state.orderStatu[0]
@@ -441,7 +443,49 @@ export default class App extends React.Component {
 
 
     componentWillMount() {
-        this.searchGoods();
+
+        console.log(this.props.navigation.state.params,'getSearchShop');
+        let getSearchShop = this.props.navigation.state.params;
+        if(getSearchShop && getSearchShop.getSearchShop){
+            this.setState({
+                goodsName:getSearchShop.getSearchShop.goodsNo
+            },()=>{
+                axios.post(`/goods/searchGoods`,
+                    {
+                        goodsNo:this.state.goodsName,
+                        ifImage:true,
+                        current:1,
+                        pageSize:20,
+                        sellerId: getSearchShop.getSearchShop.userId,
+                        modelName: getSearchShop.getSearchShop.model.indexOf(' ')==-1?getSearchShop.getSearchShop.model:'',
+                        orderByType:this.state.orderStatu[0]
+                    },
+
+                )
+                    .then((response) =>{
+                        console.log(response,'componentWillReceiveProps');
+                        this.setState({
+                            aa:true,
+                            refreshing:false,
+
+                        },()=>{
+                            if(response.data.code==0){
+                                this.setState({
+                                    goodsList:response.data.data.goodsList
+                                })
+                            }
+                        })
+
+
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+            })
+        } else {
+            this.searchGoods();
+        }
         // 读取
         storage.load({
             key: 'username',
@@ -627,16 +671,17 @@ export default class App extends React.Component {
                 axios.post(`/goods/searchGoods`,
                     {
                         goodsNo:this.state.goodsName,
+                        ifImage:true,
                         current:1,
                         pageSize:20,
                         sellerId: getSearchShop.getSearchShop.userId,
-                        modelName: getSearchShop.getSearchShop.model,
+                        modelName: getSearchShop.getSearchShop.model.indexOf(' ')==-1?getSearchShop.getSearchShop.model:'',
                         orderByType:this.state.orderStatu[0]
                     },
 
                 )
                     .then((response) =>{
-                        console.log(response);
+                        console.log(response,'componentWillReceiveProps');
                         this.setState({
                             aa:true,
                             refreshing:false,
@@ -748,7 +793,7 @@ export default class App extends React.Component {
 
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}>型号:</Text>
+                                                        <Text style={styles.f}>尺码:</Text>
                                                         <View style={[styles.b,{flex:3,}]}>
 
                                                             {
@@ -952,10 +997,10 @@ export default class App extends React.Component {
                     <FlatList
                         data={goodsList}  //列表的渲染数据源
                         ListEmptyComponent={()=><View style={{marginTop:30,alignItems:"center"}}><Text>{this.state.aa?'暂无商品数据':'查询商品中'}</Text></View>} //列表没有数据时展示，箭头函数中可以写一个react组件
-                        getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
+                        getItemLayout={(data, index) => ( {length: 400, offset: 400 * index, index} )}
                         initialNumToRender={10}  //首次渲染的条数
-                        onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
-                        onEndReachedThreshold={0.5} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
+                        // onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
+                        // onEndReachedThreshold={0.5} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
                         onRefresh={this.onRefresh} //下拉刷新
                         onScroll={this.handelScroll}
                         refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
@@ -964,8 +1009,8 @@ export default class App extends React.Component {
 
                             <View style={{borderBottomColor:"#f0f0f0",borderBottomWidth:10,padding:10}}>
                                 <View style={{flexDirection: 'row',padding:10}}>
-                                    <View style={{flex: 1,height: 100,borderColor:"#f0f0f0",borderWidth:1 }}>
-                                        <Image source={shose} style={{width:'100%',height:"100%",resizeMode:'stretch'}}/>
+                                    <View style={{flex: 1,height: 100,}}>
+                                        <Image source={item.image?{uri:item.image}:shose} style={{width:'100%',height:"100%",resizeMode:'contain'}}/>
                                     </View>
                                     <View style={{flex: 3,paddingLeft: 10,paddingRight: 10}}>
                                         <Text>{`${item.brandName} ${item.goodsNo}`}</Text>
@@ -977,7 +1022,7 @@ export default class App extends React.Component {
                                         </View>
 
                                         <View style={{flexDirection:"row",marginTop:5}}>
-                                            <View style={styles.as}><Text style={{fontSize:22,color:"orange",fontWeight:"bold"}}>{item.salePrice}</Text></View>
+                                            <View style={styles.as}><Text style={{fontSize:22,color:"orange",fontWeight:"bold"}}>{item.salePrice&&item.salePrice.toFixed(2)}</Text></View>
                                             <View style={[styles.as,{marginRight:30}]}><Text style={{color:"grey",textDecorationLine:"line-through"}}>{item.marketPrice}</Text></View>
                                             <View style={styles.as}><Text>{item.channelName}</Text></View>
                                         </View>
@@ -1019,7 +1064,7 @@ export default class App extends React.Component {
                                 </View>
 
                                 <View style={{padding:10}}>
-                                    <Text>型号</Text>
+                                    <Text>尺码</Text>
                                     <View style={{flexDirection:"row",flexWrap: "wrap"}}>
 
 
@@ -1029,9 +1074,16 @@ export default class App extends React.Component {
 
 
                                                 <View key={index} style={{marginRight:10}}>
-                                                    <View style={{width:50,padding:5,alignItems: "center",justifyContent:'center'}}><Text>{_item.stockNum==-1?'有货':_item.stockNum==0?'无货':`剩${_item.stockNum}`}</Text></View>
-                                                    <View style={{width:50,padding:5,alignItems: "center",justifyContent:'center',backgroundColor:"#f0f0f0",borderRadius:3}}><Text style={{color:_item.stockNum==0?'grey':"#000"}}>{_item.modelName}</Text></View>
-                                                    {this.isGoodsPrice(item.models,item.salePrice)&&<View style={{width:80,padding:5,}}><Text style={{color:'red'}}>{_item.salePrice}</Text></View>}
+                                                    {
+                                                        _item.stockNum!=0&&
+                                                        <View>
+                                                            <View style={{width:80,padding:5,alignItems: "center",justifyContent:'center'}}><Text>{_item.stockNum==-1?'有货':_item.stockNum==0?'无货':`剩${_item.stockNum}`}</Text></View>
+                                                            <View style={{width:80,padding:5,alignItems: "center",justifyContent:'center',backgroundColor:"#f0f0f0",borderRadius:3}}><Text style={{color:_item.stockNum==0?'grey':"#000"}}>{_item.modelName}</Text></View>
+                                                            {this.isGoodsPrice(item.models,item.salePrice)&&<View style={{width:80,padding:5,alignItems: "center",justifyContent:'center'}}><Text style={{color:'red'}}>{_item.salePrice && _item.salePrice.toFixed(2)}</Text></View>}
+
+                                                        </View>
+                                                    }
+
                                                 </View>
 
                                             )

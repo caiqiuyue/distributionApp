@@ -17,6 +17,7 @@ import {bindActionCreators} from 'redux';
 import {setHotelNo} from "../../../components/active/reducer";
 import LinearGradient from 'react-native-linear-gradient';
 import search from "../../HomePage/style/search.png";import select from '../../select.png'
+import AddPic from "./addPic";
 const RoomInfo = props => {
     return (
         <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
@@ -86,6 +87,7 @@ const RoomInfo2 = props => {
             reason:null,
             matchNum:null,
             postNo:null,
+            file:[],
             orderStatus:[
 
                 {
@@ -315,6 +317,17 @@ const RoomInfo2 = props => {
      componentWillMount() {
          this.getBuyerOrder()
          this.getSellerOrder()
+         // axios.get(`/goods/getPostageTemplate`,{
+         //     isEnable:1
+         // })
+         //     .then((response) =>{
+         //         console.log(response,'查询快递模版');
+         //
+         //     })
+         //     .catch((error)=> {
+         //         console.log(error);
+         //
+         //     })
 
      }
      componentWillReceiveProps() {
@@ -332,16 +345,19 @@ const RoomInfo2 = props => {
 
          },()=>{
              let  {details} = this.state
-             axios.get(`/order/orderPayView`,
+             axios.get(`/order/getOrderDetail`,
                  {
-                     parentId:item.parentId,
+                     orderId:item.orderId,
                  },
 
              )
                  .then((response) =>{
                      console.log(response);
                      if(response.data.code==0){
-                         details.addressItem = response.data.data.address
+                         details.addressItem = {
+                             address:response.data.data.address,
+                             phone:response.data.data.phone,
+                         }
                          this.setState({
                              details
                          })
@@ -546,9 +562,15 @@ const RoomInfo2 = props => {
      }
 
 
+     //发货
      matchOrSendGoods2 = ()=>{
          if(!this.state.postNo){
              alert('请输入快递单号')
+             return
+         }
+
+         if(!this.state.templateListValue[0]){
+             alert('选择')
              return
          }
 
@@ -557,12 +579,15 @@ const RoomInfo2 = props => {
          this.setState({
              modalVisible:false
          },()=>{
+             
+             // console.log(this.state.templateList,'this.state.templateList');
+             // console.log(this.state.templateList(_item=>_item.value==this.state.templateListValue[0])[0].label,'this.state.templateList');
              axios.post(`/order/matchOrSendGoods`,{
                  orderId:this.state.details.orderId,
                  type:2,
                  postNo:this.state.postNo,
                  postId:this.state.templateListValue[0]-0,
-                 postName:this.state.templateList(_item=>_item.value==this.state.templateListValue[0])[0].label,
+                 postName:this.state.templateList.map(_item=>_item.value==this.state.templateListValue[0])[0].label,
              },)
                  .then((response) =>{
                      console.log(response);
@@ -580,7 +605,7 @@ const RoomInfo2 = props => {
 
 
      //发货弹框
-     getPostageTemplate = ()=>{
+     getPostageTemplate = () => {
 
          this.setState({
              modal:'发货'
@@ -613,9 +638,13 @@ const RoomInfo2 = props => {
 
                          })
 
+                         console.log(templateList,'templateList');
+                         console.log(templateListValue,'templateListValue');
+
 
                          this.setState({
-                             templateList,templateListValue
+                             templateList,
+                             templateListValue
                          })
 
                      }
@@ -629,6 +658,53 @@ const RoomInfo2 = props => {
 
 
      }
+
+
+     uploadImg = () => {
+         this.setState({
+             modal:'上传照片',
+             file:[]
+         })
+     }
+
+     addPic = (item)=>{
+         console.log(item,'addPicaddPicaddPicaddPic');
+         this.setState({
+             file:item
+         })
+     }
+
+     submitUploadImg = ()=>{
+         let {file} = this.state
+         if(file.length==0){
+             alert('请上传留底照片')
+             return
+         }
+         let data=new FormData();
+         data.append('orderId',this.state.details.orderId)
+
+
+         this.state.file && this.state.file.map(item=>{
+             data.append('file',item)
+         })
+
+         this.setState({
+             modalVisible:false
+         },()=>{
+             axios.post(`/order/uploadStubImage`,data,)
+                 .then((response) =>{
+                     console.log(response);
+                     Toast.info(response.data.code==0?'提交成功':response.data.message)
+
+                 })
+                 .catch(function (error) {
+                     console.log(error);
+                 })
+         })
+
+
+     }
+
 
 
      cancelSelected = ()=>{}
@@ -829,11 +905,11 @@ const RoomInfo2 = props => {
                             <View style={{
                                 ...Platform.select({
                                     android:{
-                                        paddingBottom:260,
+                                        paddingBottom:240,
                                     },
                                     ios:{
                                         // paddingBottom:270,
-                                        paddingBottom:230,
+                                        paddingBottom:210,
                                     }
                                 }),}}>
 
@@ -930,7 +1006,7 @@ const RoomInfo2 = props => {
                                     <View>
                                         <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
 
-                                            <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看详情'?'查看详情':this.state.modal=='取消订单'?'取消订单':this.state.modal=='配货'?'配货':this.state.modal=='搜索商品'?'查询':"发货"}</Text></View>
+                                            <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看详情'?'查看详情':this.state.modal=='取消订单'?'取消订单':this.state.modal=='配货'?'配货':this.state.modal=='搜索商品'?'查询':this.state.modal=='上传照片'?'上传照片':"发货"}</Text></View>
 
 
 
@@ -959,7 +1035,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>订单时间:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{moment(details.createTime).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                                                                    <Text style={{flex:1}}>{moment(details.createTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
                                                                 </View>
                                                             </View>
 
@@ -995,7 +1071,7 @@ const RoomInfo2 = props => {
                                                             </View>
 
                                                             <View style={styles.a}>
-                                                                <Text style={styles.f}>商品型号:</Text>
+                                                                <Text style={styles.f}>商品尺码:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <Text style={{flex:1}}>{details.modelName}</Text>
                                                                 </View>
@@ -1008,6 +1084,12 @@ const RoomInfo2 = props => {
                                                                 </View>
                                                             </View>
 
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>鉴定费:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.authenticateFee}元</Text>
+                                                                </View>
+                                                            </View>
 
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>商品单价:</Text>
@@ -1066,7 +1148,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>快递编号:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.postNo}</Text>
+                                                                    <Text style={{flex:1}} selectable={true}>{details.postNo}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1074,6 +1156,13 @@ const RoomInfo2 = props => {
                                                                 <Text style={styles.f}>快递策略:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <Text style={{flex:1}}>{details.postFlag==1?'默认快递':'最低价格'}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>复制地址:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}} selectable={true}>{`${details.consignee} ${details.addressItem&&details.addressItem.phone} ${details.addressItem&&details.addressItem.address}`}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1096,7 +1185,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>货运状态:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.postState==0?"待发货": details.postState==1?"发货中" :details.postState==2?"确认收货":details.postState==3?"退货中":"确认退货"}</Text>
+                                                                    <Text style={{flex:1}}>{details.postState==0?"待发货": details.postState==1?"发货中" :details.postState==2?"确认收货":details.postState==3?"退货中":details.postState==-3?"审核失败":details.postState==-2?"待审核":details.postState==-1?"待上传留底":"确认退货"}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1147,6 +1236,14 @@ const RoomInfo2 = props => {
                                                         <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
                                                             <TouchableHighlight onPress={this.getPostageTemplate} underlayColor="#f96f59" style={{width:100,padding:10,backgroundColor:"orange",borderRadius:5,alignItems:"center",justifyContent:"center",}}>
                                                                 <Text style={{color:"#fff"}}>发货</Text>
+                                                            </TouchableHighlight>
+
+
+                                                        </View>}
+                                                        {((details.goodsState==1 ||details.goodsState==2) && details.capitalState==2 && details.postState==-1)&&
+                                                        <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
+                                                            <TouchableHighlight onPress={this.uploadImg} underlayColor="#f96f59" style={{width:150,padding:10,backgroundColor:"orange",borderRadius:5,alignItems:"center",justifyContent:"center",}}>
+                                                                <Text style={{color:"#fff"}}>上传留底照片</Text>
                                                             </TouchableHighlight>
 
 
@@ -1207,7 +1304,7 @@ const RoomInfo2 = props => {
                                                                 </View>
 
                                                                 <View style={styles.a}>
-                                                                    <Text style={styles.f}>商品型号:</Text>
+                                                                    <Text style={styles.f}>商品尺码:</Text>
                                                                     <View style={[styles.b,{flex:3}]}>
                                                                         <Text style={{flex:1}}>{details.modelName}</Text>
                                                                     </View>
@@ -1362,7 +1459,31 @@ const RoomInfo2 = props => {
                                                                     </ScrollView>
                                                                 </View>
 
-                                                            </View>
+                                                            </View>:
+                                                            this.state.modal=='上传照片'?
+                                                                <View style={{padding:10}}>
+
+                                                                    <View>
+                                                                        <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
+                                                                            <AddPic  addPic={this.addPic}/>
+
+                                                                        </ScrollView>
+
+
+
+                                                                        <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
+                                                                            <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                                <TouchableHighlight onPress={()=>{this.submitUploadImg()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                                    <Text style={{color:"#fff"}}>确定</Text>
+                                                                                </TouchableHighlight>
+                                                                            </LinearGradient>
+                                                                        </View>
+                                                                    </View>
+
+
+
+
+                                                                </View>
 
                                                         :<View style={{padding:10}}>
 
@@ -1384,7 +1505,7 @@ const RoomInfo2 = props => {
                                                                 </View>
 
                                                                 <View style={styles.a}>
-                                                                    <Text style={styles.f}>商品型号:</Text>
+                                                                    <Text style={styles.f}>商品尺码:</Text>
                                                                     <View style={[styles.b,{flex:3}]}>
                                                                         <Text style={{flex:1}}>{details.modelName}</Text>
                                                                     </View>

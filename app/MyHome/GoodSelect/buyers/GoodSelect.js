@@ -11,7 +11,7 @@ import search from "../../HomePage/style/search.png";
 import {Picker,DatePicker,Toast} from 'antd-mobile'
 import axios from "../../../axios";
 import moment from "moment";
-import AddPic from "./addPic";
+import AddPic from "../addPic";
 import PayComponents from "../../HomePage/buyers/payComponents";
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -388,16 +388,19 @@ const RoomInfo2 = props => {
 
          },()=>{
              let  {details} = this.state
-             axios.get(`/order/orderPayView`,
+             axios.get(`/order/getOrderDetail`,
                  {
-                     parentId:item.parentId,
+                     orderId:item.orderId,
                  },
 
              )
                  .then((response) =>{
                      console.log(response);
                      if(response.data.code==0){
-                         details.addressItem = response.data.data.address
+                         details.addressItem = {
+                             address:response.data.data.address,
+                             phone:response.data.data.phone,
+                         }
                          this.setState({
                              details
                          })
@@ -839,11 +842,11 @@ const RoomInfo2 = props => {
                             <View style={{
                                 ...Platform.select({
                                     android:{
-                                        paddingBottom:260,
+                                        paddingBottom:240,
                                     },
                                     ios:{
-                                        // paddingBottom:270,
-                                        paddingBottom:230,
+                                        // paddingBottom:230,
+                                        paddingBottom:210,
                                     }
                                 }),}}>
 
@@ -967,7 +970,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>订单时间:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{moment(details.createTime).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                                                                    <Text style={{flex:1}}>{moment(details.createTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1003,7 +1006,7 @@ const RoomInfo2 = props => {
                                                             </View>
 
                                                             <View style={styles.a}>
-                                                                <Text style={styles.f}>商品型号:</Text>
+                                                                <Text style={styles.f}>商品尺码:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <Text style={{flex:1}}>{details.modelName}</Text>
                                                                 </View>
@@ -1013,6 +1016,13 @@ const RoomInfo2 = props => {
                                                                 <Text style={styles.f}>商品数量:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <Text style={{flex:1}}>{details.goodsNum}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>鉴定费:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.authenticateFee}元</Text>
                                                                 </View>
                                                             </View>
 
@@ -1073,7 +1083,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>快递编号:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.postNo}</Text>
+                                                                    <Text style={{flex:1}} selectable={true}>{details.postNo}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1082,6 +1092,13 @@ const RoomInfo2 = props => {
                                                                 <Text style={styles.f}>快递策略:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <Text style={{flex:1}}>{details.postFlag==1?'默认快递':'最低价格'}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>复制地址:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}} selectable={true}>{`${details.consignee} ${details.addressItem&&details.addressItem.phone} ${details.addressItem&&details.addressItem.address}`}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1104,7 +1121,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>货运状态:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.postState==0?"待发货": details.postState==1?"发货中" :details.postState==2?"确认收货":details.postState==3?"退货中":"确认退货"}</Text>
+                                                                    <Text style={{flex:1}}>{details.postState==0?"待发货": details.postState==1?"发货中" :details.postState==2?"确认收货":details.postState==3?"退货中":details.postState==-3?"审核失败":details.postState==-2?"待审核":details.postState==-1?"待上传留底":"确认退货"}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1180,9 +1197,6 @@ const RoomInfo2 = props => {
                                                                     <Text style={{color:"#fff"}}>退货</Text>
                                                                 </TouchableHighlight>
                                                             </LinearGradient>
-
-
-
 
 
                                                         </View>}

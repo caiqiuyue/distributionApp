@@ -5,11 +5,22 @@ import {
 } from 'react-native';
 import Dimensions from 'Dimensions';
 import axios from "../../axios";
-import {Toast} from "antd-mobile";
+import {Picker,Toast} from "antd-mobile";
 import LinearGradient from 'react-native-linear-gradient';
 import RNFS from 'react-native-fs';
+import s1 from "../HomePage/style/234.png";
 import bankCardAttribution from "./bank";
+const RoomInfo = props => {
+    return (
+        <TouchableHighlight style={{}} underlayColor="transparent" onPress={props.onClick}>
 
+            <View style={{backgroundColor:"#fff",flexDirection:"row",width:"100%",borderColor:"#ccc",borderWidth:1,borderRadius:5,overflow:'hidden'}}>
+                <View style={{flex:3,padding:8}}><Text style={{color:"grey"}}>{props.extra}</Text></View>
+                <View style={{flex:1,padding:8,backgroundColor:'#ccc',alignItems:"center",justifyContent:"center",borderColor:"#ccc",borderWidth:1,}}><Image style={{height:10,width:15}} source={s1}/></View>
+            </View>
+        </TouchableHighlight>
+    )
+};
 
 export default class Mine extends React.Component {
     constructor(props) {
@@ -20,6 +31,12 @@ export default class Mine extends React.Component {
             name:null,
             cardType:'',
             bankcardNo:'',
+            wayList:[
+                {label:'微信',value:'1'},
+                {label:'支付宝',value:'2'},
+                {label:'银行卡',value:'3'},
+            ],
+            way:[],
         }
 
     }
@@ -46,13 +63,14 @@ export default class Mine extends React.Component {
     }
 
     comfirmSelected = ()=>{
-        let {amount,name,bankcardNo,cardType} = this.state
+        let {amount,name,bankcardNo,cardType,way} = this.state
+
 
         axios.post(`/account/applyWithdraw`,{
                 amount,
                 accountName:name,
                 bankName:cardType,
-                banKNo:bankcardNo
+                bankNo:way[0]==3?bankcardNo:bankcardNo.replace(/\s+/g,"")
 
 
             },
@@ -70,12 +88,28 @@ export default class Mine extends React.Component {
     cancelSelected = ()=>{}
 
 
+    setWay = (way)=>{
+        this.setState({
+            way,
+            cardType:way==1?'微信':way==2?'支付宝':'',
+            name:null,
+            bankcardNo:'',
+
+        })
+
+    }
     submit = ()=>{
-        let {amount,name,bankcardNo,cardType,data} = this.state
+        let {way,amount,name,bankcardNo,cardType,data} = this.state
+        
+        console.log(bankcardNo,'bankcardNo');
 
 
+        if(!way[0]){
+            Toast.info('请选择提现方式',1)
+            return
+        }
         if(!name){
-            Toast.info('请输入账户名称',1)
+            Toast.info(way[0]==3?'请输入账户名称':'请输入真实姓名',1)
             return
         }
 
@@ -84,17 +118,17 @@ export default class Mine extends React.Component {
             return
         }
 
-        if((amount-0)>(data.balance-0)){
-            Toast.info('提现金额不能大于账户余额',1)
-            return
-        }
+        // if((amount-0)>(data.balance-0)){
+        //     Toast.info('提现金额不能大于账户余额',1)
+        //     return
+        // }
 
         if(bankcardNo==''){
-            Toast.info('请输入银行卡号',1)
+            Toast.info(`${way[0]==1?'微信':way[0]==2?'支付宝':'银行卡'}号不能为空`,1)
             return
         }
 
-        if(!cardType){
+        if(!cardType && way[0]==3){
             Toast.info('未匹配到您的银行卡类型,请重新输入',1)
             return
         }
@@ -165,19 +199,20 @@ export default class Mine extends React.Component {
                     </View>
 
                     <View style={styles.a}>
-                        <Text style={{flex:1}}>账户名称:</Text>
+                        <Text style={{flex:1}}>提现方式:</Text>
                         <View style={[styles.b,{flex:3}]}>
-                            <TextInput
-                                placeholder={'请输入账户名称'}
-                                // value={this.state.username}
-                                style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
-                                underlineColorAndroid="transparent"
-                                onChangeText={(name) => this.setState({name})}
-                            >
-                            </TextInput>
+                            <Picker
+                                data={this.state.wayList}
+                                cols={1}
+                                extra={'请选择提现方式'}
+                                value={this.state.way}
+                                // onOk={channelId => {this.setState({channelId});}}
+                                onChange={way => {this.setWay(way);}}
+                                className="forss">
+                                <RoomInfo></RoomInfo>
+                            </Picker>
                         </View>
                     </View>
-
 
                     <View style={styles.a}>
                         <Text style={{flex:1}}>提现金额:</Text>
@@ -194,35 +229,86 @@ export default class Mine extends React.Component {
                         </View>
                     </View>
 
-                    <View style={styles.a}>
-                        <Text style={{flex:1}}>银行卡号:</Text>
-                        <View style={[styles.b,{flex:3}]}>
-                            <TextInput
-                                placeholder={'请输入银行卡号'}
-                                keyboardType='numeric'
-                                // value={this.state.username}
-                                style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
-                                underlineColorAndroid="transparent"
-                                value={this.bankNumRep(this.state.bankcardNo)}
-                                onChangeText={(bankcardNo) => this.changeBankCard(bankcardNo)}
-                            >
-                            </TextInput>
-                        </View>
-                    </View>
 
-                    <View style={styles.a}>
-                        <Text style={{flex:1}}>银行名称:</Text>
-                        <View style={[styles.b,{flex:3}]}>
-                            <TextInput
-                                placeholder={'输入银行卡号后，系统自动获取'}
-                                value={this.state.cardType}
-                                editable={false}
-                                style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
-                                underlineColorAndroid="transparent"
-                            >
-                            </TextInput>
-                        </View>
-                    </View>
+                    {
+                        this.state.way[0]!=3?
+                            <View>
+                                <View style={styles.a}>
+                                    <Text style={{flex:1}}>{this.state.way[0]==1?'微信':this.state.way[0]==2?'支付宝':''}号:</Text>
+                                    <View style={[styles.b,{flex:3}]}>
+                                        <TextInput
+                                            placeholder={this.state.way[0]==1?'请输入微信号':this.state.way[0]==2?'请输入支付宝号':''}
+                                            // value={this.state.username}
+                                            style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
+                                            underlineColorAndroid="transparent"
+                                            // value={this.bankNumRep(this.state.bankcardNo)}
+                                            onChangeText={(bankcardNo) => this.setState({bankcardNo})}
+                                        >
+                                        </TextInput>
+                                    </View>
+                                </View>
+                                <View style={styles.a}>
+                                    <Text style={{flex:1}}>真实姓名:</Text>
+                                    <View style={[styles.b,{flex:3}]}>
+                                        <TextInput
+                                            placeholder={'转账验证需用'}
+                                            // value={this.state.username}
+                                            style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
+                                            underlineColorAndroid="transparent"
+                                            onChangeText={(name) => this.setState({name})}
+                                        >
+                                        </TextInput>
+                                    </View>
+                                </View>
+                            </View>:
+                            <View>
+                                <View style={styles.a}>
+                                    <Text style={{flex:1}}>账户名称:</Text>
+                                    <View style={[styles.b,{flex:3}]}>
+                                        <TextInput
+                                            placeholder={'请输入账户名称'}
+                                            // value={this.state.username}
+                                            style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
+                                            underlineColorAndroid="transparent"
+                                            onChangeText={(name) => this.setState({name})}
+                                        >
+                                        </TextInput>
+                                    </View>
+                                </View>
+
+
+                                <View style={styles.a}>
+                                    <Text style={{flex:1}}>银行卡号:</Text>
+                                    <View style={[styles.b,{flex:3}]}>
+                                        <TextInput
+                                            placeholder={'请输入银行卡号'}
+                                            keyboardType='numeric'
+                                            // value={this.state.username}
+                                            style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
+                                            underlineColorAndroid="transparent"
+                                            value={this.bankNumRep(this.state.bankcardNo)}
+                                            onChangeText={(bankcardNo) => this.changeBankCard(bankcardNo)}
+                                        >
+                                        </TextInput>
+                                    </View>
+                                </View>
+
+                                <View style={styles.a}>
+                                    <Text style={{flex:1}}>银行名称:</Text>
+                                    <View style={[styles.b,{flex:3}]}>
+                                        <TextInput
+                                            placeholder={'输入银行卡号后，系统自动获取'}
+                                            value={this.state.cardType}
+                                            editable={false}
+                                            style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
+                                            underlineColorAndroid="transparent"
+                                        >
+                                        </TextInput>
+                                    </View>
+                                </View>
+                            </View>
+                    }
+
 
                     <View style={styles.a}>
                         <Text style={{flex:1}}>提现说明:</Text>

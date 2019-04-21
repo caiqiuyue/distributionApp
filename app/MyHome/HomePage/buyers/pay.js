@@ -5,9 +5,9 @@ import {
     TextInput,
     StyleSheet,
     TouchableHighlight,
-    View,Dimensions,
-    DeviceEventEmitter,Modal,ScrollView,Image,
-    Platform
+    View, Dimensions,
+    DeviceEventEmitter, Modal, ScrollView, Image,
+    Platform, Alert
 
 } from 'react-native';
 
@@ -243,7 +243,35 @@ export default class App extends React.Component {
         this.setState({ modalVisible: true ,modal:"地址"});
     }
 
+    comfirmSelected=()=>{
+        const { navigate } = this.props.navigation;
+        navigate('Security',{ user: 'set' })
+    }
 
+    componentDidMount() {
+        axios.get(`/account/getAccount`,{},
+        )
+            .then((response) =>{
+                console.log(response);
+                if(response.data.code==0){
+                    let data = response.data.data
+                    if(data.notInit){
+                        Alert.alert('您还未设置支付密码','请先设置支付密码',
+                            [
+                                {text:"取消", onPress:this.comfirmSelected},
+                                {text:"确认", onPress:this.comfirmSelected}
+                            ],
+                            { cancelable: false }
+                        );
+                    }
+
+                }
+
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
     componentWillMount() {
         storage.load({ //读取tokenKey
             key: 'username',
@@ -326,7 +354,7 @@ export default class App extends React.Component {
                             item.postId = val[0];
                             item.postFee = 0;
                             item.postName = item.templateList.filter(_item=>_item.value==val[0])[0].label;
-                            item.goodsAmount = (item.postFee-0)+(item.salePrice-0)*item.stockNo;
+                            item.goodsAmount = (_val.authenticateFee-0)+(item.postFee-0)+(item.salePrice-0)*item.stockNo;
                         });
                         _val.models.map(item=>{
                             totalMoney += item.goodsAmount * 1
@@ -377,6 +405,8 @@ export default class App extends React.Component {
             postFlag:item,
         })
     }
+
+
 
 
 
@@ -997,10 +1027,7 @@ export default class App extends React.Component {
                                                 <DashLine/>
 
                                                 <View style={{flexDirection:"row",marginTop:5,justifyContent:"space-between"}}>
-
-                                                    <View  style={{flex:1,justifyContent:"center"}}><Text>快递选择</Text></View>
-
-                                                    <View style={{flex:3,}}>
+                                                    <View style={{flex:2,}}>
                                                         <View style={{width:"90%"}}>
                                                             <Picker
                                                                 data={item.templateList}
@@ -1014,8 +1041,9 @@ export default class App extends React.Component {
                                                         </View>
 
                                                     </View>
-
                                                     <View style={{flex:1,justifyContent:"center",alignItems:"center"}}><Text>邮费:<Text style={{color:"orange"}}>{item.postFee}元</Text></Text></View>
+                                                    <View  style={{flex:1,justifyContent:"center"}}><Text>鉴定费:<Text style={{color:"orange"}}>{_item.authenticateFee}元</Text></Text></View>
+
                                                 </View>
                                                 <DashLine/>
 

@@ -7,23 +7,15 @@ import {
 import {Toast } from 'antd-mobile';
 import axios from 'axios'
 
-
 import loginCss from './style/loginCss'
 
 import lockIcon from './style/lockIcon.png'
 import phoneIcon from './style/phoneIcon.png'
 import eye_close from './style/eye_close.png'
 import eye_open from './style/eye_open.png'
-import companyPhone from './style/companyPhone.png'
-import email from './style/email.png'
-import yzm from './style/yzm.png'
-import realName from './style/realName.png'
-import bg from './style/bg.png'
 import loginBg from './style/loginBg.png'
 
 import LinearGradient from 'react-native-linear-gradient';
-
-import selectIcon from '../../MyHome/HomePage/style/selectIcon.png'
 
 export default class Login extends Component {
     constructor(props) {
@@ -34,11 +26,38 @@ export default class Login extends Component {
             codeSMS: '',
             password: '',
             code:null,
+            url:"",
+            passwordT:true,
             CountDown: false,
+            passwordFlag:false,
             CountDownNum: 60,
+            hei:0,
         };
     }
 
+    componentWillMount(){
+
+        // 读取
+        storage.load({
+            key: 'url',
+            // autoSync(默认为true)意味着在没有找到数据或数据过期时自动调用相应的sync方法
+            autoSync: false
+        }).then(ret => {
+            this.setState({
+                url:ret.url
+            })
+        }).catch(err => {
+            //如果没有找到数据且没有sync方法，
+            //或者有其他异常，则在catch中返回
+            console.warn(err.message);
+            switch (err.name) {
+                case 'NotFoundError':
+                    break;
+                case 'ExpiredError':
+                    break;
+            }
+        });
+    }
 
     //密码可见
     changePasswordType=()=>{
@@ -64,7 +83,7 @@ export default class Login extends Component {
     focus=()=>{
 
         this.setState({
-            hei:200,
+            hei:100,
         })
 
 
@@ -89,11 +108,14 @@ export default class Login extends Component {
 
         const {phone,codeSMS, smsId, password,url ,} = this.state;
 
-        let reg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$");
+        const reg = /^[\w_-]{6,16}$/
 
 
         if(phone.trim()==''){
             Toast.info('手机号不能为空',1);
+            return
+        }else if(!reg.test(password)){
+            Toast.info('密码至少为六位，不能包含特殊字符',1);
             return
         }else if(password.trim()==''){
             Toast.info('密码不能为空',1);
@@ -105,7 +127,7 @@ export default class Login extends Component {
 
 
             //这里发送Ajax
-            axios.post(`${url}/user/register`, {
+            axios.post(`${url}/user/editPassword`, {
                 phone: phone,
                 smsCode: codeSMS,
                 smsId: smsId,
@@ -118,7 +140,7 @@ export default class Login extends Component {
                     if(response.data.code!=0){
                         Toast.info(response.data.message, 1);
                     } else {
-                        Toast.info('注册成功', 1);
+                        Toast.info('找回成功', 1);
                         navigate('Login',{ user: '' });
 
                     }
@@ -155,12 +177,14 @@ export default class Login extends Component {
             {
                 params:{
                     phone: this.state.phone,
+                    imgCode:'houzi'
                 }
             }
 
 
         )
             .then( (response)=> {
+                console.log(response,'response');
                 if(response.data.code == 0) {
                     //请求发送成功设置定时器
                     this.setState({
@@ -214,32 +238,34 @@ export default class Login extends Component {
 
 
 
-                <View style={{alignItems:"center",width:"100%",zIndex:999,position:"absolute",top:10}}>
+                <View style={{alignItems:"center",width:"100%",zIndex:999,position:"absolute",top:50}}>
 
 
-                    <View  style={{marginTop:10,height:Dimensions.get('window').height-180}}>
+                    <View  style={{marginTop:10,height:Dimensions.get('window').height/3-30}}>
                         <ScrollView style={{}}>
                             <View style={{alignItems:"center",paddingBottom:hei}}>
-                                <View style={{marginTop:10,flexDirection:"row",padding:5,borderBottomColor:"#d49a98",borderBottomWidth:2}}>
-                                    <View style={{justifyContent:'center',}}><Image source={phoneIcon} style={styles.iconImg}/></View>
-                                    <View style={{justifyContent:'center',alignItems:"center",marginLeft:10}}>
-                                        <TextInput
-
-                                            placeholder="手机号"
-                                            style={{minWidth:300,padding:5}}
-                                            onFocus={this.focus}
-                                            keyboardType='numeric'
-                                            underlineColorAndroid="transparent"
-                                            onChangeText={(phone) => this.setState({phone})}
-                                        >
-                                        </TextInput>
-                                    </View>
-
-                                </View>
 
                                 <View style={{backgroundColor:"#fff",width:"80%",borderRadius:10}}>
                                     <View style={{padding:10,borderRadius:10,}}>
-                                        <View style={{marginTop:10}}>
+                                        <View>
+
+                                            <View style={{flexDirection:"row",padding:5,borderBottomColor:"#d49a98",borderBottomWidth:2}}>
+                                                <View style={{justifyContent:'center',}}><Image source={phoneIcon} style={styles.iconImg}/></View>
+                                                <View style={{justifyContent:'center',alignItems:"center",marginLeft:10}}>
+                                                    <TextInput
+
+                                                        placeholder="手机号"
+                                                        style={{minWidth:300,padding:5}}
+                                                        onFocus={this.focus}
+                                                        keyboardType='numeric'
+                                                        underlineColorAndroid="transparent"
+                                                        onChangeText={(phone) => this.setState({phone})}
+                                                    >
+                                                    </TextInput>
+                                                </View>
+
+                                            </View>
+
                                             <View style={{marginTop:10,flexDirection:"row",padding:5,borderBottomColor:"#d49a98",borderBottomWidth:2}}>
                                                 <View style={{justifyContent:'center',}}><Image source={lockIcon} style={styles.iconImg}/></View>
                                                 <View style={{justifyContent:'center',marginLeft:10,flex:1}}>

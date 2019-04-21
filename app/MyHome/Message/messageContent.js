@@ -46,7 +46,26 @@ const setDate = (date) => {
 
 
 };
-
+const getText = (value) => {
+    const texts = {
+        '-1': '提现到账',
+        '-2': '退款到账',
+        '-3': '收款到账',
+        '-8': '买家申请发票',
+        '-9': '卖家开票',
+        '1': '订单支付',
+        '2': '卖家接单',
+        '3': '卖家拒绝',
+        '4': '卖家配货',
+        '5': '卖家无货',
+        '6': '卖家发货',
+        '7': '买家收货',
+        '8': '买家发起工单',
+        '9': '卖家回复工单',
+        '15': '到货通知'
+    }
+    return texts[value];
+};
 
 class ReadMessage extends React.Component {
     constructor(props) {
@@ -90,7 +109,7 @@ class ReadMessage extends React.Component {
 
         axios.post(`/notice/getMessageList`, {
             current:1,
-            pageSize:10
+            pageSize:50
         })
             .then( (response)=> {
                 console.log(response,'componentWillMount获取消息');
@@ -182,7 +201,7 @@ class ReadMessage extends React.Component {
             },()=>{
                 axios.post(`/notice/getMessageList`, {
                     current:this.state.pages,
-                    pageSize:10
+                    pageSize:50
                 })
                     .then((response) =>{
                         console.log(response);
@@ -234,7 +253,7 @@ class ReadMessage extends React.Component {
 
         axios.post(`/notice/getMessageList`, {
             current:1,
-            pageSize:10
+            pageSize:50
         })
             .then( (response)=> {
                 console.log(response,'componentWillMount获取消息');
@@ -279,10 +298,14 @@ class ReadMessage extends React.Component {
 
 
     jumptoBtn = (item) => {
-
+        console.log(item,'publishpublishpublishpublishpublishpublish');
         const { navigate } = this.props.navigation;
 
-        navigate('GoodSelect',{ user: "" });
+
+        let data = {};
+        data.publishId = item.tradeNo;
+
+        navigate((item.tradeType==-1||item.tradeType==-2||item.tradeType==-3)?'WalletDetail':(item.tradeType==1||item.tradeType==2||item.tradeType==3||item.tradeType==4||item.tradeType==5||item.tradeType==6||item.tradeType==7)?'GoodSelect':(item.tradeType==8||item.tradeType==9)?'Order':'Publish',{ messageJump: data });
 
     };
 
@@ -292,6 +315,10 @@ class ReadMessage extends React.Component {
     render(){
 
         let {handelMsg,changeMsg,unreadData,readData,refreshing,} = this.state;
+        // 交易类型 -1提现到账 -2退款到账 -3收款到账 -8买家申请发票 -9卖家开票
+        // 1订单支付 2卖家接单 3卖家拒绝 4卖家配货 5卖家无货 6卖家发货 7买家收货 8买家发起工单 9卖家回复工单
+        // 15到货通知
+        let  aaa= []
 
 
         return (
@@ -351,7 +378,7 @@ class ReadMessage extends React.Component {
                                     getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
                                     initialNumToRender={10}  //首次渲染的条数
                                     onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
-                                    onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
+                                    onEndReachedThreshold={0.3} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
                                     onRefresh={this.onRefresh} //下拉刷新
                                     refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
                                     keyExtractor={(item,index)=>`${index}`}
@@ -364,7 +391,7 @@ class ReadMessage extends React.Component {
                                                     <View  style={{alignItems:"center",flexDirection:"row",marginLeft:0}}>
                                                         <Image style={{height:20,width:20,marginRight:5}}
                                                                source={unread}/>
-                                                        <Text style={{fontSize:14}}>{item.tradeNo}</Text>
+                                                        <Text style={{fontSize:14}}>{getText(item.tradeType)}</Text>
                                                     </View>
 
                                                     <Text style={{marginTop:5,color:"grey"}}>{setDate(item.createTime)}</Text>
@@ -403,7 +430,7 @@ class ReadMessage extends React.Component {
                                     getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
                                     initialNumToRender={10}  //首次渲染的条数
                                     // onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
-                                    onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
+                                    onEndReachedThreshold={0.3} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
                                     onRefresh={this.onRefresh} //下拉刷新
                                     refreshing={refreshing} //下拉刷新时候的正在加载的符号，设置为true显示，false隐藏。加载完成，需要设置为false
                                     keyExtractor={(item,index)=>`${index}`}
@@ -416,7 +443,7 @@ class ReadMessage extends React.Component {
                                                     <View  style={{alignItems:"center",flexDirection:"row",marginLeft:0}}>
                                                         <Image style={{height:20,width:20,marginRight:5}}
                                                                source={read}/>
-                                                        <Text style={{fontSize:14}}>{item.tradeNo}</Text>
+                                                        <Text style={{fontSize:14}}>{getText(item.tradeType)}</Text>
                                                     </View>
 
                                                     <Text style={{marginTop:5,color:"grey"}}>{setDate(item.createTime)}</Text>

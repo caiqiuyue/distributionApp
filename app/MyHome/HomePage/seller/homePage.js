@@ -282,80 +282,19 @@ export default class App extends React.Component {
             return
         }
 
-        if(!shelvesGoodsName){
-            alert('请填写商品名称')
-            return
-        }
-
-        if(!brandName){
-            alert('请填写品牌')
-            return
-        }
-
-        // if(!season[0]){
-        //     alert('请选择季节')
-        //     return
-        // }
-
-        // if(!date){
-        //     alert('请选择上市日期')
-        //     return
-        // }
-
-        // if(!category){
-        //     alert('请填写分类')
-        //     return
-        // }
-
-        if(!marketPrice){
-            alert('请填写市场价格')
-            return
-        }
-
         if(!salePrice){
             alert('请填写售卖价格')
             return
         }
 
-        if(!gender[0]){
-            alert('请选择性别')
-            return
-        }
-
-        if(!series){
-            alert('请填写系列')
-            return
-        }
-
-        if(!type[0]){
-            alert('请选择类型')
-            return
-        }
-
-        if(!color){
-            alert('请填写颜色')
-            return
-        }
-
         if(modelList.length==0){
-            alert('请添加型号')
+            alert('请添加尺码')
             return
         }
 
         let data = {
             channelId:channelId[0],
-            sex:gender[0],
             goodsNo:goodsNo,
-            goodsName:shelvesGoodsName,
-            brandName:brandName,
-            season:season[0],
-            series:series,
-            type:type[0],
-            category:category,
-            sport:sport,
-            color:color,
-            marketTime:date&&moment(date).format('YYYY-MM-DD'),
-            marketPrice:marketPrice-0,
             salePrice:salePrice-0,
             modelList:modelList,
 
@@ -408,80 +347,10 @@ export default class App extends React.Component {
     }
 
 
-    getGoodsBaseByNo = ()=>{
-
-    }
-
-
     setGoodsNo = (item)=>{
-
         this.setState({
             goodsNo:item
         });
-        clearTimeout(this.timer);
-        this.timer = setTimeout(() => {
-            axios.get(`/goods/getGoodsBaseByNo`,
-                {goodsNo:item}
-            )
-                .then((response) =>{
-                    console.log(response);
-                    if(response.data.code==0){
-
-                        if(response.data.data.goods){
-
-                            let goods = response.data.data.goods
-
-                            let gender = [];
-                            let season = [];
-                            let type = [];
-                            let channelId = [];
-
-                            let {categoryList} = this.state
-
-                            let a = this.state.channelList.filter(item=> {return item.value==goods.channelId})
-                            let b = categoryList.filter(item=> {return item.value==goods.type})
-
-                            if(b.length==0){
-                                let c = {
-                                    label:goods.type,
-                                    value:goods.type,
-                                }
-
-                                categoryList.push(c)
-                            }
-
-                            gender[0] = goods.sex!=null?goods.sex+'':'1';
-                            season[0] = goods.season?goods.season:'';
-                            type[0] = goods.type?goods.type:'';
-                            channelId[0] = a.length>0?a[0].value:'';
-
-
-                            this.setState({
-
-                                gender,
-                                season,
-                                type,
-                                channelId,
-                                categoryList,
-                                brandName:goods.brandName?goods.brandName:null,
-                                goodsNo:goods.goodsNo?goods.goodsNo:null,
-                                shelvesGoodsName:goods.goodsName?goods.goodsName:null,
-                                series:goods.series?goods.series:null,
-                                category:goods.category?goods.category:null,
-                                sport:goods.sport?goods.sport:null,
-                                color:goods.color?goods.color:null,
-                                marketPrice:goods.marketPrice?goods.marketPrice+'':null,
-                                salePrice:goods.salePrice?goods.salePrice+'':null,
-                                date:goods.marketTime?new Date(goods.marketTime):null,
-                            })
-                        }
-
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                })
-        }, 1000);
     };
 
 
@@ -693,7 +562,8 @@ export default class App extends React.Component {
                                                                 cols={1}
                                                                 extra={'请选择渠道'}
                                                                 value={this.state.channelId}
-                                                                onOk={channelId => {this.setState({channelId});}}
+                                                                // onOk={channelId => {this.setState({channelId});}}
+                                                                onChange={channelId => {this.setState({channelId});}}
                                                                 className="forss">
                                                                 <RoomInfo></RoomInfo>
                                                             </Picker>
@@ -702,92 +572,92 @@ export default class App extends React.Component {
 
 
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>商品名称:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <TextInput
-                                                                placeholder={this.state.shelvesGoodsName?this.state.shelvesGoodsName:'请填写商品名称'}
-                                                                style={styles.teCor}
-                                                                placeholderTextColor={this.state.shelvesGoodsName?"#000":'#ccc'}
-                                                                underlineColorAndroid="transparent"
-                                                                onChangeText={(shelvesGoodsName) => this.setState({shelvesGoodsName})}
-                                                            />
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}><Text style={{color:"red"}}>*</Text>商品名称:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<TextInput*/}
+                                                                {/*placeholder={this.state.shelvesGoodsName?this.state.shelvesGoodsName:'请填写商品名称'}*/}
+                                                                {/*style={styles.teCor}*/}
+                                                                {/*placeholderTextColor={this.state.shelvesGoodsName?"#000":'#ccc'}*/}
+                                                                {/*underlineColorAndroid="transparent"*/}
+                                                                {/*onChangeText={(shelvesGoodsName) => this.setState({shelvesGoodsName})}*/}
+                                                            {/*/>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>品牌:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <TextInput
-                                                                placeholder={this.state.brandName?this.state.brandName:'请填写品牌'}
-                                                                placeholderTextColor={this.state.brandName?"#000":'#ccc'}
-                                                                style={styles.teCor}
-                                                                underlineColorAndroid="transparent"
-                                                                onChangeText={(brandName) => this.setState({brandName})}
-                                                            />
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}><Text style={{color:"red"}}>*</Text>品牌:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<TextInput*/}
+                                                                {/*placeholder={this.state.brandName?this.state.brandName:'请填写品牌'}*/}
+                                                                {/*placeholderTextColor={this.state.brandName?"#000":'#ccc'}*/}
+                                                                {/*style={styles.teCor}*/}
+                                                                {/*underlineColorAndroid="transparent"*/}
+                                                                {/*onChangeText={(brandName) => this.setState({brandName})}*/}
+                                                            {/*/>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>性别:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <Picker
-                                                                data={this.state.genderList}
-                                                                cols={1}
-                                                                extra={'请选择性别'}
-                                                                value={this.state.gender}
-                                                                onChange={gender => {this.setState({gender});}}
-                                                                className="forss">
-                                                                <RoomInfo></RoomInfo>
-                                                            </Picker>
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}><Text style={{color:"red"}}>*</Text>性别:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<Picker*/}
+                                                                {/*data={this.state.genderList}*/}
+                                                                {/*cols={1}*/}
+                                                                {/*extra={'请选择性别'}*/}
+                                                                {/*value={this.state.gender}*/}
+                                                                {/*onChange={gender => {this.setState({gender});}}*/}
+                                                                {/*className="forss">*/}
+                                                                {/*<RoomInfo></RoomInfo>*/}
+                                                            {/*</Picker>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}>上市日期:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <DatePicker
-                                                                extra="请选择日期"
-                                                                format={val => moment(val).format('YYYY-MM-DD')}
-                                                                value={this.state.date}
-                                                                mode="date"
-                                                                onChange={date => this.setState({date})}
-                                                            >
-                                                                <RoomInfo></RoomInfo>
-                                                            </DatePicker>
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}>上市日期:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<DatePicker*/}
+                                                                {/*extra="请选择日期"*/}
+                                                                {/*format={val => moment(val).format('YYYY-MM-DD')}*/}
+                                                                {/*value={this.state.date}*/}
+                                                                {/*mode="date"*/}
+                                                                {/*onChange={date => this.setState({date})}*/}
+                                                            {/*>*/}
+                                                                {/*<RoomInfo></RoomInfo>*/}
+                                                            {/*</DatePicker>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}>季节:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <Picker
-                                                                data={this.state.seasonList}
-                                                                cols={1}
-                                                                extra={'请选择季节'}
-                                                                value={this.state.season}
-                                                                onChange={season => {this.setState({season});}}
-                                                                className="forss">
-                                                                <RoomInfo></RoomInfo>
-                                                            </Picker>
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}>季节:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<Picker*/}
+                                                                {/*data={this.state.seasonList}*/}
+                                                                {/*cols={1}*/}
+                                                                {/*extra={'请选择季节'}*/}
+                                                                {/*value={this.state.season}*/}
+                                                                {/*onChange={season => {this.setState({season});}}*/}
+                                                                {/*className="forss">*/}
+                                                                {/*<RoomInfo></RoomInfo>*/}
+                                                            {/*</Picker>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>市场价格:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <TextInput
-                                                                placeholder={this.state.marketPrice?this.state.marketPrice:'请填写市场价格'}
-                                                                keyboardType={'numeric'}
-                                                                style={styles.teCor}
-                                                                placeholderTextColor={this.state.marketPrice?"#000":'#ccc'}
-                                                                onFocus={this.focus}
-                                                                underlineColorAndroid="transparent"
-                                                                value={this.state.marketPrice}
-                                                                onChangeText={(marketPrice) => this.setState({marketPrice})}
-                                                            />
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}><Text style={{color:"red"}}>*</Text>市场价格:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<TextInput*/}
+                                                                {/*placeholder={this.state.marketPrice?this.state.marketPrice:'请填写市场价格'}*/}
+                                                                {/*keyboardType={'numeric'}*/}
+                                                                {/*style={styles.teCor}*/}
+                                                                {/*placeholderTextColor={this.state.marketPrice?"#000":'#ccc'}*/}
+                                                                {/*onFocus={this.focus}*/}
+                                                                {/*underlineColorAndroid="transparent"*/}
+                                                                {/*value={this.state.marketPrice}*/}
+                                                                {/*onChangeText={(marketPrice) => this.setState({marketPrice})}*/}
+                                                            {/*/>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
                                                     <View style={styles.a}>
                                                         <Text style={styles.f}><Text style={{color:"red"}}>*</Text>售卖价格:</Text>
@@ -806,79 +676,79 @@ export default class App extends React.Component {
                                                     </View>
 
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>类型:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <Picker
-                                                                data={this.state.categoryList}
-                                                                cols={1}
-                                                                extra={'请选择类型'}
-                                                                value={this.state.type}
-                                                                onChange={type => {this.setState({type});}}
-                                                                className="forss">
-                                                                <RoomInfo></RoomInfo>
-                                                            </Picker>
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}><Text style={{color:"red"}}>*</Text>类型:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<Picker*/}
+                                                                {/*data={this.state.categoryList}*/}
+                                                                {/*cols={1}*/}
+                                                                {/*extra={'请选择类型'}*/}
+                                                                {/*value={this.state.type}*/}
+                                                                {/*onChange={type => {this.setState({type});}}*/}
+                                                                {/*className="forss">*/}
+                                                                {/*<RoomInfo></RoomInfo>*/}
+                                                            {/*</Picker>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>系列:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <TextInput
-                                                                placeholder={this.state.series?this.state.series:'请填写系列'}
-                                                                onFocus={this.focus}
-                                                                style={styles.teCor}
-                                                                placeholderTextColor={this.state.series?"#000":'#ccc'}
-                                                                underlineColorAndroid="transparent"
-                                                                onChangeText={(series) => this.setState({series})}
-                                                            />
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}><Text style={{color:"red"}}>*</Text>系列:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<TextInput*/}
+                                                                {/*placeholder={this.state.series?this.state.series:'请填写系列'}*/}
+                                                                {/*onFocus={this.focus}*/}
+                                                                {/*style={styles.teCor}*/}
+                                                                {/*placeholderTextColor={this.state.series?"#000":'#ccc'}*/}
+                                                                {/*underlineColorAndroid="transparent"*/}
+                                                                {/*onChangeText={(series) => this.setState({series})}*/}
+                                                            {/*/>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}>分类:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <TextInput
-                                                                placeholder={this.state.category?this.state.category:'请填写分类'}
-                                                                onFocus={this.focus}
-                                                                style={styles.teCor}
-                                                                placeholderTextColor={this.state.category?"#000":'#ccc'}
-                                                                underlineColorAndroid="transparent"
-                                                                onChangeText={(category) => this.setState({category})}
-                                                            />
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}>分类:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<TextInput*/}
+                                                                {/*placeholder={this.state.category?this.state.category:'请填写分类'}*/}
+                                                                {/*onFocus={this.focus}*/}
+                                                                {/*style={styles.teCor}*/}
+                                                                {/*placeholderTextColor={this.state.category?"#000":'#ccc'}*/}
+                                                                {/*underlineColorAndroid="transparent"*/}
+                                                                {/*onChangeText={(category) => this.setState({category})}*/}
+                                                            {/*/>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}>运动类型:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <TextInput
-                                                                placeholder={this.state.sport?this.state.sport:'请填写运动类型'}
-                                                                onFocus={this.focus}
-                                                                style={styles.teCor}
-                                                                placeholderTextColor={this.state.sport?"#000":'#ccc'}
-                                                                underlineColorAndroid="transparent"
-                                                                onChangeText={(sport) => this.setState({sport})}
-                                                            />
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}>运动类型:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<TextInput*/}
+                                                                {/*placeholder={this.state.sport?this.state.sport:'请填写运动类型'}*/}
+                                                                {/*onFocus={this.focus}*/}
+                                                                {/*style={styles.teCor}*/}
+                                                                {/*placeholderTextColor={this.state.sport?"#000":'#ccc'}*/}
+                                                                {/*underlineColorAndroid="transparent"*/}
+                                                                {/*onChangeText={(sport) => this.setState({sport})}*/}
+                                                            {/*/>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
 
 
-                                                    <View style={styles.a}>
-                                                        <Text style={styles.f}><Text style={{color:"red"}}>*</Text>颜色:</Text>
-                                                        <View style={[styles.b,{flex:3}]}>
-                                                            <TextInput
-                                                                placeholder={this.state.color?this.state.color:'请填写颜色'}
-                                                                onFocus={this.focus}
-                                                                style={styles.teCor}
-                                                                underlineColorAndroid="transparent"
-                                                                placeholderTextColor={this.state.color?"#000":'#ccc'}
-                                                                onChangeText={(color) => this.setState({color})}
-                                                            />
-                                                        </View>
-                                                    </View>
+                                                    {/*<View style={styles.a}>*/}
+                                                        {/*<Text style={styles.f}><Text style={{color:"red"}}>*</Text>颜色:</Text>*/}
+                                                        {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                            {/*<TextInput*/}
+                                                                {/*placeholder={this.state.color?this.state.color:'请填写颜色'}*/}
+                                                                {/*onFocus={this.focus}*/}
+                                                                {/*style={styles.teCor}*/}
+                                                                {/*underlineColorAndroid="transparent"*/}
+                                                                {/*placeholderTextColor={this.state.color?"#000":'#ccc'}*/}
+                                                                {/*onChangeText={(color) => this.setState({color})}*/}
+                                                            {/*/>*/}
+                                                        {/*</View>*/}
+                                                    {/*</View>*/}
 
                                                     <AddModels addModel={this.addModel} salePrice={this.state.salePrice || null} />
 
@@ -964,7 +834,7 @@ export default class App extends React.Component {
 
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}>型号:</Text>
+                                                        <Text style={styles.f}>尺码:</Text>
                                                         <View style={[styles.b,{flex:3}]}>
                                                             <Text>{editGoodsInfo.model}</Text>
                                                         </View>
@@ -1102,7 +972,7 @@ export default class App extends React.Component {
                     <FlatList
                         data={goodsList}  //列表的渲染数据源
                         ListEmptyComponent={()=><View style={{marginTop:30,alignItems:"center"}}><Text>{this.state.aa?'暂无商品数据':'查询商品中'}</Text></View>} //列表没有数据时展示，箭头函数中可以写一个react组件
-                        getItemLayout={(data, index) => ( {length: 80, offset: 80 * index, index} )}
+                        getItemLayout={(data, index) => ( {length: 200, offset: 200 * index, index} )}
                         initialNumToRender={10}  //首次渲染的条数
                         onEndReached={this.onEndReached}  //列表被滚动到距离内容最底部不足onEndReachedThreshold的距离时调用。
                         onEndReachedThreshold={0.1} //定当距离内容最底部还有多远时触发onEndReached回调。注意此参数是一个比值而非像素单位。比如，0.5表示距离内容最底部的距离为当前列表可见长度的一半时触发。
@@ -1129,7 +999,7 @@ export default class App extends React.Component {
                                                 </View>
 
                                                 <View style={{flexDirection:"row",marginTop:5}}>
-                                                    <View style={styles.as}><Text><Text style={{color:"grey"}}>型号名称:</Text>{item.model}</Text></View>
+                                                    <View style={styles.as}><Text><Text style={{color:"grey"}}>尺码名称:</Text>{item.model}</Text></View>
                                                     <View style={styles.as}><Text><Text style={{color:"grey"}}>库存数量:</Text>{item.stock}</Text></View>
                                                 </View>
 

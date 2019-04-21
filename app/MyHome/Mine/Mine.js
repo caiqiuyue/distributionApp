@@ -221,7 +221,7 @@ class Mine extends React.Component {
                 <TouchableHighlight onPress={this.security}>
                     <View style={styles.aa}>
                         <View style={styles.imgView}><Image style={styles.img} source={setup}/></View>
-                        <Text>个人设置</Text>
+                        <Text>安全设置</Text>
                         <View  style={{flex:1,justifyContent:'flex-end'}}>
                             {/*<Text style={{textAlign:'right',color:"#ec833a"}}>{this.state.account?this.state.account.toFixed(2):'0.00'}元</Text>*/}
                         </View>

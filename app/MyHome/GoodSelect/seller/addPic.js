@@ -2,52 +2,12 @@ import React,{Component} from 'react';
 import {Alert,View,DeviceEventEmitter, ScrollView,Text, TouchableHighlight, TextInput,Image, Modal, StyleSheet,Platform} from 'react-native';
 
 import Dimensions from "Dimensions";
-import axios from "../../../axios";
 import add from "../style/add.png";
 import {Toast} from 'antd-mobile'
 
 import ImagePicker from "react-native-image-picker";
 
-uploadImage = (imgAry) => {
 
-    let file = {}
-    let files = []
-
-    if(Array.isArray(imgAry)) {
-        for(let i = 0; i < imgAry.length; i ++){
-            //截取获取文件名
-            let a = imgAry[i].uri;
-            let arr = a.split('/');
-            // 获取文件名end
-            // 判断文件的类型(视频-图片等)end
-            file = {uri: imgAry[i], type: imgAry[i].mime, name: arr[arr.length-1]}; //这里的key(uri和type和name)不能改变,
-            //这里的files就是后台需要的key
-
-            files.push(file)
-
-
-        }
-
-
-    } else {
-        //截取获取文件名
-        let a = imgAry[i].uri;
-        let arr = a.split('/');
-        // 获取文件名end
-        // 判断文件的类型(视频-图片等)end
-        file = {uri: imgAry[i], type: imgAry[i].mime, name: arr[arr.length-1]}; //这里的key(uri和type和name)不能改变,
-
-        files.push(file)
-        // console.log('file222', file);
-
-        //这里的files就是后台需要的key
-    }
-
-
-    return files
-
-
-}
 
 export default class Mine extends React.Component {
     constructor(props) {
@@ -59,6 +19,49 @@ export default class Mine extends React.Component {
         }
 
         this.aa=false;
+
+    }
+
+    uploadImages = (imgAry, type) => {
+
+
+        let file = {}
+        let files = []
+        console.log('测试测试1111', imgAry);
+        if(Array.isArray(imgAry)) {
+            for(let i = 0; i < imgAry.length; i ++){
+                //截取获取文件名
+                let a = imgAry[i].uri;
+                let arr = a.split('/');
+                // 获取文件名end
+                // 判断文件的类型(视频-图片等)end
+                // imgAry[i] = !Platform.OS === 'android'?imgAry[i].uri:imgAry[i].uri.replace('file://', '')
+                file = {uri: imgAry[i].uri, type: imgAry[i].mimeType || type, name: arr[arr.length-1]}; //这里的key(uri和type和name)不能改变,
+                //这里的files就是后台需要的key
+
+                files.push(file)
+
+
+            }
+
+
+        } else {
+            //截取获取文件名
+            let a = imgAry[i].uri;
+            let arr = a.split('/');
+            // 获取文件名end
+            // 判断文件的类型(视频-图片等)end
+            file = {uri: imgAry[i].uri, type: imgAry[i].mimeType, name: arr[arr.length-1]}; //这里的key(uri和type和name)不能改变,
+
+            files.push(file)
+            console.log('file222', file);
+
+            //这里的files就是后台需要的key
+        }
+
+
+        return files
+
 
     }
 
@@ -106,25 +109,26 @@ export default class Mine extends React.Component {
 
                 let {file,imgArr} = this.state
 
-                if(imgArr.length>3){
-                    alert('最多可添加三张图片')
+                if(imgArr.length>5){
+                    alert('最多可添加5张图片')
                     return
                 }
 
                 
-                console.log(imgArr);
+                console.log(imgArr, '刚刚上传的图片');
 
                 let aaa = [
                     {uri:response.uri}
                 ]
 
+                let qq = JSON.parse(JSON.stringify(response.uri))
 
                 console.log(response);
 
-                uploadImage(aaa);
+                // this.uploadImages(aaa,response.type);
 
                 this.setState({
-                    file:[...file,...uploadImage(aaa)],
+                    file:[...file,...this.uploadImages(aaa, response.type)],
                     imgArr:[...imgArr,aaa[0]],
                 },()=>{
                     this.props.addPic(this.state.file)

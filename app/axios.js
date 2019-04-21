@@ -1,10 +1,40 @@
 import ajax from 'axios';
+import {NetInfo} from "react-native";
+import {Toast} from "antd-mobile";
 
 //请求域名头
 const urlTitle = 'https://39.105.201.251/distributor';
 
 
 const clientApi = (type, url, data, resolve, reject) => {
+
+    //检测网络是否连接
+    NetInfo.isConnected.fetch().done((isConnected) => {
+        console.log(isConnected,'isConnected');
+    });
+
+    //检测网络连接信息
+    NetInfo.getConnectionInfo().done((connectionInfo) => {
+        console.log(connectionInfo,'connectionInfo');
+        if(connectionInfo.type=='none'){
+
+            Toast.info('暂无网络链接',1)
+        }else if(connectionInfo.type=='unknown'){
+            // Toast.info('联网状态异常',1)
+        }
+    });
+
+    //监听网络变化事件
+    NetInfo.addEventListener('connectionChange', (networkType) => {
+        console.log(networkType,'networkType');
+
+        if(networkType=='none'){
+
+            Toast.info('暂无网络链接',1)
+        }else if(networkType=='unknown'){
+            Toast.info('联网状态异常',1)
+        }
+    });
     //console.log(global);
     //首先判断global里面有没有TOKEN
     if(global.TOKEN) {

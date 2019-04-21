@@ -78,7 +78,7 @@ class Detail extends Component {
             <View style={styles.box}>
 
                 <View style={styles.a}>
-                    <Text style={styles.f}><Text style={{color:"red"}}>*</Text>添加型号:</Text>
+                    <Text style={styles.f}><Text style={{color:"red"}}>*</Text>添加尺码:</Text>
                     <View style={[styles.b,{flex:3}]}>
                         <TouchableHighlight underlayColor="transparent" onPress={this.handlePressButton}>
                             <Image source={add} style={{width:20,height:20}}/>
@@ -92,7 +92,7 @@ class Detail extends Component {
                         <View style={styles.a} key={`model-${index}`}>
                             <View style={[styles.b,{flex:3}]}>
                                 <TextInput
-                                    placeholder={item.name?item.name:'商品型号'}
+                                    placeholder={item.name?item.name:'商品尺码'}
                                     style={styles.teCor}
                                     autoCapitalize={'none'}
                                     underlineColorAndroid="transparent"

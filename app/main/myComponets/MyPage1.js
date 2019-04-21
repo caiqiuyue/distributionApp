@@ -652,7 +652,7 @@ export default class App extends React.Component {
 
 
                                                     <View style={styles.a}>
-                                                        <Text style={styles.f}>型号:</Text>
+                                                        <Text style={styles.f}>尺码:</Text>
                                                         <View style={[styles.b,{flex:3,}]}>
 
                                                             {
@@ -855,7 +855,7 @@ export default class App extends React.Component {
                                 </View>
 
                                 <View style={{padding:10}}>
-                                    <Text>型号</Text>
+                                    <Text>尺码</Text>
                                     <View style={{flexDirection:"row",flexWrap: "wrap"}}>
 
 

@@ -556,7 +556,7 @@ import select from '../../select.png'
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>订单时间:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{moment(details.createTime).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                                                                    <Text style={{flex:1}}>{moment(details.createTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
                                                                 </View>
                                                             </View>
 
@@ -592,7 +592,7 @@ import select from '../../select.png'
                                                             </View>
 
                                                             <View style={styles.a}>
-                                                                <Text style={styles.f}>商品型号:</Text>
+                                                                <Text style={styles.f}>商品尺码:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <Text style={{flex:1}}>{details.modelName}</Text>
                                                                 </View>

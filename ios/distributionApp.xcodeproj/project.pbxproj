@@ -47,7 +47,7 @@
 		7F52989D06A94080BA251C7F /* libCodePush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7267F9E663374279B5D7DCCC /* libCodePush.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		862260E421D634B400ABCB8E /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 862260BE21D6345600ABCB8E /* libRCTCameraRoll.a */; };
-		9C6E2F5A5FDD4320AACC7E59 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0597F503E5BF43148CA5C270 /* UserNotifications.framework */; };
+		9C6E2F5A5FDD4320AACC7E59 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0597F503E5BF43148CA5C270 /* UserNotifications.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		CCD35D0DE2744818952A7159 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4863A852693F4721BA1FAE5C /* CoreGraphics.framework */; };
 		CE197BA260C548B0BCD3C062 /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41F40E070E584E4BABA12379 /* libBVLinearGradient.a */; };
@@ -446,6 +446,7 @@
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		862260B021D6345500ABCB8E /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
 		865AA1DE2216C9C800C44836 /* distributionApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = distributionApp.entitlements; path = distributionApp/distributionApp.entitlements; sourceTree = "<group>"; };
+		86D66A952264566600C2C9F0 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		919B936A19FF4C6A99048047 /* RCTJCoreModule.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTJCoreModule.xcodeproj; path = "../node_modules/jcore-react-native/ios/RCTJCoreModule.xcodeproj"; sourceTree = "<group>"; };
 		A5C4655A76124937A8021D51 /* RCTJPushModule.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTJPushModule.xcodeproj; path = "../node_modules/jpush-react-native/ios/RCTJPushModule.xcodeproj"; sourceTree = "<group>"; };
 		A63C57924A834B17AF6BE179 /* CodePush.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = CodePush.xcodeproj; path = "../node_modules/react-native-code-push/ios/CodePush.xcodeproj"; sourceTree = "<group>"; };
@@ -1485,6 +1486,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				13B07FB21A68108700A75B9A /* Base */,
+				86D66A952264566600C2C9F0 /* zh-Hans */,
 			);
 			name = LaunchScreen.xib;
 			path = distributionApp;
@@ -1811,6 +1813,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -1864,6 +1867,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;

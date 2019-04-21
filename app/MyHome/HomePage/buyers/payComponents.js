@@ -80,9 +80,11 @@ export default class App extends React.Component {
         let data = {
             parentId:this.parentId,
             payMoney:this.state.payDatas.payMoney,
-            password:payPassword-0,
+            password:payPassword,
             skip_verify:"46396EF464AA44EFB155740B804ADBF2"
         }
+        
+        console.log(data);
 
 
 
