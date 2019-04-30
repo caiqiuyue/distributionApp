@@ -52,6 +52,7 @@ import select from '../../select.png'
             noData1:false,
             noData2:false,
             noData3:false,
+            padd:0,
             aa:false,
             bb:false,
             cc:false,
@@ -87,6 +88,9 @@ import select from '../../select.png'
 
             ],
             ordStatu:[''],
+            postName:'',
+            postNo:'',
+            reply:'',
             modal:"查看详情"
 
 
@@ -244,14 +248,38 @@ import select from '../../select.png'
 
 
      details=(item)=>{
-         
-         console.log(item,'itemitemitemitemitem');
-         
-         this.setState({
-             details: item,
-             modalVisible: true,
-             modal:"查看详情"
 
+         console.log(item,'1111111111');
+         let aaa =JSON.parse(JSON.stringify(item))
+
+         this.setState({
+             details: aaa,
+             modalVisible: true,
+             modal:"查看详情",
+
+         },()=>{
+             let  {details} = this.state
+             axios.get(`/order/getOrderDetail`,
+                 {
+                     orderId:item.orderId,
+                 },
+
+             )
+                 .then((response) =>{
+                     console.log(response);
+                     if(response.data.code==0){
+
+                         details.backPostNo = aaa.postNo
+                         details.backPostName = aaa.postName
+                         this.setState({
+                             details:Object.assign(details, response.data.data)
+                         })
+                     }
+
+                 })
+                 .catch(function (error) {
+                     console.log(error);
+                 })
          })
      }
 
@@ -264,7 +292,9 @@ import select from '../../select.png'
              axios.post(`/order/sellerReply`,{
                  serviceId:this.state.details.serviceId,
                  type:1,
-                 reply:this.state.reply
+                 reply:this.state.reply,
+                 postNo:this.state.postNo,
+                 postName:this.state.postName,
              },)
                  .then((response) =>{
                      console.log(response);
@@ -465,6 +495,12 @@ import select from '../../select.png'
      }
 
 
+     focus=()=>{
+
+         this.setState({
+             padd:300,
+         })
+     }
 
     render(){
 
@@ -527,7 +563,7 @@ import select from '../../select.png'
                                     <View>
                                         <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
 
-                                            <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看详情'?'查看详情':this.state.modal=='取消订单'?'取消订单':this.state.modal=='配货'?'配货':"发货"}</Text></View>
+                                            <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看详情'?'查看详情':this.state.modal=='取消订单'?'取消订单':this.state.modal=='配货'?'配货':"处理"}</Text></View>
 
 
 
@@ -570,9 +606,9 @@ import select from '../../select.png'
                                                             </View>
 
                                                             <View style={styles.a}>
-                                                                <Text style={styles.f}>退款金额:</Text>
+                                                                <Text style={styles.f}>订单总金额:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1,color:"orange",fontSize:18,fontWeight:"bold"}}>{details.backMoney}元</Text>
+                                                                    <Text style={{flex:1,color:"orange",fontSize:18,fontWeight:"bold"}}>{details.goodsAmount}元</Text>
                                                                 </View>
                                                             </View>
 
@@ -625,6 +661,20 @@ import select from '../../select.png'
                                                                 </View>
                                                             </View>
 
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>鉴定费:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.authenticateFee}元</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>商品单价:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.goodsPrice}元</Text>
+                                                                </View>
+                                                            </View>
+
 
                                                             <View style={{borderLeftWidth:3,borderLeftColor:'#f96f59',marginTop:15}}>
                                                                 <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>快递信息</Text>
@@ -641,7 +691,6 @@ import select from '../../select.png'
                                                                 </View>
                                                             </View>
 
-
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>退货地址:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
@@ -652,20 +701,17 @@ import select from '../../select.png'
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>退货快递单号:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.postNo}</Text>
+                                                                    <Text style={{flex:1}}>{details.backPostNo}</Text>
                                                                 </View>
                                                             </View>
-
 
 
                                                             <View style={styles.a}>
-                                                                <Text style={styles.f}>快递名称:</Text>
+                                                                <Text style={styles.f}>退货快递名称:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.postName}</Text>
+                                                                    <Text style={{flex:1}}>{details.backPostName}</Text>
                                                                 </View>
                                                             </View>
-
-
 
 
 
@@ -681,6 +727,34 @@ import select from '../../select.png'
                                                                 <Text style={styles.f}>服务状态:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <Text style={{flex:1}}>{details.serviceStatus==0?"未受理": details.serviceStatus==1?"受理中":"已受理"}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>配货状态:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.goodsState==0?"待配货": details.goodsState==1?"部分配货" :details.goodsState==2?"完全配货":"无货"}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>货运状态:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.postState==0?"待发货": details.postState==1?"发货中" :details.postState==2?"确认收货":details.postState==3?"退货中":details.postState==-3?"审核失败":details.postState==-2?"待审核":details.postState==-1?"待上传留底":"确认退货"}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>订单状态:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.orderState==-1?'删除':details.orderState==1?'买家新建':details.orderState==2?'卖家反馈中':details.orderState==3?'买家撤销':details.orderState==4?'卖家接受':details.orderState==5?'卖家拒绝':details.orderState==6?'订单异议':details.orderState==7?'订单完成':'订单关闭'}</Text>
+                                                                </View>
+                                                            </View>
+
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>资金状态:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.capitalState==0?'待支付':details.capitalState==1?'买家已付款':details.capitalState==2?'平台托管':details.capitalState==3?'平台解付中':details.capitalState==4?'卖家已收款':details.capitalState==5?'卖家已退款':details.capitalState==6?'平台托管':details.capitalState==7?'平台解付':'买家已退款'}</Text>
                                                                 </View>
                                                             </View>
 
@@ -730,7 +804,6 @@ import select from '../../select.png'
                                                     </View>}
 
 
-
                                                 </View>:
 
                                                 this.state.modal=='处理'?
@@ -738,65 +811,117 @@ import select from '../../select.png'
                                                     <View style={{padding:10}}>
                                                         <View>
                                                             <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
-
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>问题类型:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text  style={{flex:1}}>{details.problemType==1?'无理由退货':details.problemType==2?'实物不符':details.problemType==3?'货物破损':details.problemType==4?'拒收快递':details.problemType==5?'未按时发货':details.problemType==6?'未收到货':details.problemType==7?'少件漏件':'邮费异差'}</Text>
+                                                                <View style={{paddingBottom:this.state.padd}}>
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>问题类型:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text  style={{flex:1}}>{details.problemType==1?'无理由退货':details.problemType==2?'实物不符':details.problemType==3?'货物破损':details.problemType==4?'拒收快递':details.problemType==5?'未按时发货':details.problemType==6?'未收到货':details.problemType==7?'少件漏件':'邮费异差'}</Text>
+                                                                        </View>
                                                                     </View>
-                                                                </View>
 
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>处理方式:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.processType==1?"退货退款": details.processType==2?"仅退款":"补发货"}</Text>
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>处理方式:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.processType==1?"退货退款": details.processType==2?"仅退款":"补发货"}</Text>
+                                                                        </View>
                                                                     </View>
-                                                                </View>
 
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>买家问题描述:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.buyerProblem}</Text>
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>买家问题描述:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.buyerProblem}</Text>
+                                                                        </View>
                                                                     </View>
-                                                                </View>
-
-
-                                                                {details.images&&
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>问题图片:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        {
-                                                                            details.images.map((item,index)=>
-                                                                                <View key={index} style={{height:210,marginTop:10}} >
-                                                                                    <Image style={{height:200,width:"80%",resizeMode:"stretch"}}
-                                                                                           source={{uri:item}}
-                                                                                    />
+                                                                    {
+                                                                        details.processType==3?
+                                                                            <View>
+                                                                                <View style={styles.a}>
+                                                                                    <Text style={styles.f}>快递名称:</Text>
+                                                                                    <View style={[styles.b,{flex:3}]}>
+                                                                                        <TextInput
+                                                                                            placeholder={'请填写快递名称'}
+                                                                                            onFocus={this.focus}
+                                                                                            style={styles.teCor}
+                                                                                            autoCapitalize={'none'}
+                                                                                            underlineColorAndroid="transparent"
+                                                                                            onChangeText={(postName) => this.setState({postName})}
+                                                                                        />
+                                                                                    </View>
                                                                                 </View>
-                                                                            )
-                                                                        }
+
+                                                                                <View style={styles.a}>
+                                                                                    <Text style={styles.f}>快递单号:</Text>
+                                                                                    <View style={[styles.b,{flex:3}]}>
+                                                                                        <TextInput
+                                                                                            placeholder={'请填写单号'}
+                                                                                            onFocus={this.focus}
+                                                                                            style={styles.teCor}
+                                                                                            autoCapitalize={'none'}
+                                                                                            underlineColorAndroid="transparent"
+                                                                                            onChangeText={(postNo) => this.setState({postNo})}
+                                                                                        />
+                                                                                    </View>
+                                                                                </View>
+                                                                            </View>:null
+                                                                    }
+
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>回复:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <TextInput
+                                                                                placeholder={'请填写回复'}
+                                                                                multiline={true}
+                                                                                onFocus={this.focus}
+                                                                                style={[styles.teCor,{height:100,}]}
+                                                                                underlineColorAndroid="transparent"
+                                                                                onChangeText={(reply) => this.setState({reply})}
+                                                                            />
+                                                                        </View>
+                                                                    </View>
+
+
+
+                                                                    {details.images&&
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>问题图片:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            {
+                                                                                details.images.map((item,index)=>
+                                                                                    <View key={index} style={{height:210,marginTop:10}} >
+                                                                                        <Image style={{height:200,width:"80%",resizeMode:"stretch"}}
+                                                                                               source={{uri:item}}
+                                                                                        />
+                                                                                    </View>
+                                                                                )
+                                                                            }
+                                                                        </View>
+                                                                    </View>
+
+                                                                    }
+
+                                                                    <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-around",marginTop:20}}>
+
+
+                                                                        <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                            <TouchableHighlight onPress={()=>{this.acceptOrder()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                                <Text style={{color:"#fff"}}>接受</Text>
+                                                                            </TouchableHighlight>
+                                                                        </LinearGradient>
+
+                                                                        <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                            <TouchableHighlight onPress={()=>{this.refuseOrder()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                                <Text style={{color:"#fff"}}>拒绝</Text>
+                                                                            </TouchableHighlight>
+                                                                        </LinearGradient>
+
                                                                     </View>
                                                                 </View>
-
-                                                                }
 
                                                             </ScrollView>
 
-                                                            <View style={{flexDirection:"row",alignItems:"center",justifyContent:"space-around",marginTop:20}}>
 
-
-                                                                <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
-                                                                    <TouchableHighlight onPress={()=>{this.acceptOrder()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
-                                                                        <Text style={{color:"#fff"}}>接受</Text>
-                                                                    </TouchableHighlight>
-                                                                </LinearGradient>
-
-                                                                <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
-                                                                    <TouchableHighlight onPress={()=>{this.refuseOrder()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
-                                                                        <Text style={{color:"#fff"}}>拒绝</Text>
-                                                                    </TouchableHighlight>
-                                                                </LinearGradient>
-
-                                                            </View>
                                                         </View>
                                                     </View>
 
@@ -860,16 +985,11 @@ import select from '../../select.png'
 
 
 
-                                                    <View style={[{flex:1,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text>{item.modelName}</Text>
-                                                        <Text  style={{marginTop:5,}}>{item.goodsNum}件</Text>
-                                                    </View>
-
-
-                                                    <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text style={{color:"grey"}}>退款金额</Text>
-                                                        <Text  style={{marginTop:5,fontSize:18,color:"orange"}}>{item.backMoney}元</Text>
-                                                    </View>
+                                                    {/*<View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>*/}
+                                                        {/*<Text>{item.modelName}</Text>*/}
+                                                        {/*<Text  style={{marginTop:5,}}>{item.brandName}</Text>*/}
+                                                        {/*<Text  style={{marginTop:5,}}>{item.goodsNum}件</Text>*/}
+                                                    {/*</View>*/}
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text>问题描述:<Text style={{color:"red"}}>{item.buyerProblem}</Text></Text>
@@ -931,16 +1051,11 @@ import select from '../../select.png'
 
 
 
-                                                    <View style={[{flex:1,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text>{item.modelName}</Text>
-                                                        <Text  style={{marginTop:5,}}>{item.goodsNum}件</Text>
-                                                    </View>
-
-
-                                                    <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text style={{color:"grey"}}>退款金额</Text>
-                                                        <Text  style={{marginTop:5,fontSize:18,color:"orange"}}>{item.backMoney}元</Text>
-                                                    </View>
+                                                    {/*<View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>*/}
+                                                        {/*<Text>{item.modelName}</Text>*/}
+                                                        {/*<Text  style={{marginTop:5,}}>{item.brandName}</Text>*/}
+                                                        {/*<Text  style={{marginTop:5,}}>{item.goodsNum}件</Text>*/}
+                                                    {/*</View>*/}
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text>问题描述:<Text style={{color:"red"}}>{item.buyerProblem}</Text></Text>
@@ -1001,16 +1116,11 @@ import select from '../../select.png'
 
 
 
-                                                    <View style={[{flex:1,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text>{item.modelName}</Text>
-                                                        <Text  style={{marginTop:5,}}>{item.goodsNum}件</Text>
-                                                    </View>
-
-
-                                                    <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text style={{color:"grey"}}>退款金额</Text>
-                                                        <Text  style={{marginTop:5,fontSize:18,color:"orange"}}>{item.backMoney}元</Text>
-                                                    </View>
+                                                    {/*<View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>*/}
+                                                        {/*<Text>{item.modelName}</Text>*/}
+                                                        {/*<Text  style={{marginTop:5,}}>{item.brandName}</Text>*/}
+                                                        {/*<Text  style={{marginTop:5,}}>{item.goodsNum}件</Text>*/}
+                                                    {/*</View>*/}
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text>问题描述:<Text style={{color:"red"}}>{item.buyerProblem}</Text></Text>
@@ -1100,7 +1210,8 @@ const styles = StyleSheet.create({
 
     fontcolor:{
         color:"grey"
-    }
+    },
+    teCor:{minWidth:'100%',padding:10,backgroundColor:"#fff",borderRadius:5,borderColor:"#ccc",borderWidth:1},
 
 
 });

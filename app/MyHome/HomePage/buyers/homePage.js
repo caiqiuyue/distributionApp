@@ -457,7 +457,7 @@ export default class App extends React.Component {
                         current:1,
                         pageSize:20,
                         sellerId: getSearchShop.getSearchShop.userId,
-                        modelName: getSearchShop.getSearchShop.model.indexOf(' ')==-1?getSearchShop.getSearchShop.model:'',
+                        modelName: getSearchShop.getSearchShop.model&&getSearchShop.getSearchShop.model.indexOf(' ')==-1?getSearchShop.getSearchShop.model:'',
                         orderByType:this.state.orderStatu[0]
                     },
 
@@ -675,7 +675,7 @@ export default class App extends React.Component {
                         current:1,
                         pageSize:20,
                         sellerId: getSearchShop.getSearchShop.userId,
-                        modelName: getSearchShop.getSearchShop.model.indexOf(' ')==-1?getSearchShop.getSearchShop.model:'',
+                        modelName: getSearchShop.getSearchShop.model&&getSearchShop.getSearchShop.model.indexOf(' ')==-1?getSearchShop.getSearchShop.model:'',
                         orderByType:this.state.orderStatu[0]
                     },
 

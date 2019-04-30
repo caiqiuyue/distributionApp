@@ -358,6 +358,11 @@ const RoomInfo2 = props => {
                              address:response.data.data.address,
                              phone:response.data.data.phone,
                          }
+                         details.goodsState = response.data.data.goodsState
+                         details.postState = response.data.data.postState
+                         details.orderState = response.data.data.orderState
+                         details.capitalState = response.data.data.capitalState
+
                          this.setState({
                              details
                          })
@@ -695,6 +700,8 @@ const RoomInfo2 = props => {
                  .then((response) =>{
                      console.log(response);
                      Toast.info(response.data.code==0?'提交成功':response.data.message)
+                     this.onRefresh()
+
 
                  })
                  .catch(function (error) {
@@ -1192,7 +1199,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>订单状态:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.orderState==-1?'删除':details.orderState==1?'买家新建':details.orderState==2?'卖家反馈中':details.orderState==3?'买家撤销':details.orderState==4?'卖家接受':details.orderState==5?'卖家拒绝':details.details==6?'订单异议':details.details==7?'订单完成':'订单关闭'}</Text>
+                                                                    <Text style={{flex:1}}>{details.orderState==-1?'删除':details.orderState==1?'买家新建':details.orderState==2?'卖家反馈中':details.orderState==3?'买家撤销':details.orderState==4?'卖家接受':details.orderState==5?'卖家拒绝':details.orderState==6?'订单异议':details.orderState==7?'订单完成':'订单关闭'}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1203,9 +1210,15 @@ const RoomInfo2 = props => {
                                                                 </View>
                                                             </View>
                                                             <View style={styles.a}>
-                                                                <Text style={styles.f}>备注:</Text>
+                                                                <Text style={styles.f}>买家备注:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <Text style={{flex:1}}>{details.remark}</Text>
+                                                                </View>
+                                                            </View>
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>卖家备注:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.orderDesc}</Text>
                                                                 </View>
                                                             </View>
                                                         </ScrollView>
@@ -1231,6 +1244,7 @@ const RoomInfo2 = props => {
 
 
                                                         </View>}
+
 
                                                         {((details.goodsState==1 ||details.goodsState==2) && details.capitalState==2 && details.postState==0)&&
                                                         <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
@@ -1288,65 +1302,70 @@ const RoomInfo2 = props => {
 
                                                             <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
 
+                                                                <View style={{paddingBottom:this.state.padd}}>
+                                                                    <View style={{borderLeftWidth:3,borderLeftColor:'#f96f59',marginTop:15}}>
+                                                                        <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>商品信息</Text>
+                                                                    </View>
 
-                                                                <View style={{borderLeftWidth:3,borderLeftColor:'#f96f59',marginTop:15}}>
-                                                                    <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>商品信息</Text>
-                                                                </View>
-
-                                                                <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
+                                                                    <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
 
 
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>货号:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.goodsNo}</Text>
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>货号:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.goodsNo}</Text>
+                                                                        </View>
+                                                                    </View>
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>商品尺码:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.modelName}</Text>
+                                                                        </View>
+                                                                    </View>
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>商品数量:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.goodsNum}</Text>
+                                                                        </View>
+                                                                    </View>
+
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>商品单价:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.goodsPrice}元</Text>
+                                                                        </View>
+                                                                    </View>
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>配货:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <TextInput
+                                                                                placeholder={'请填写配货数量'}
+                                                                                style={[styles.teCor,]}
+                                                                                onFocus={this.focus}
+                                                                                underlineColorAndroid="transparent"
+                                                                                onChangeText={(matchNum) => this.setState({matchNum})}
+                                                                            />
+                                                                        </View>
+                                                                    </View>
+                                                                    <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
+                                                                        <TouchableHighlight onPress={this.matchOrSendGoods1} underlayColor="#f96f59" style={{width:100,padding:10,backgroundColor:"orange",borderRadius:5,alignItems:"center",justifyContent:"center",}}>
+                                                                            <Text style={{color:"#fff"}}>配货</Text>
+                                                                        </TouchableHighlight>
+
                                                                     </View>
                                                                 </View>
 
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>商品尺码:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.modelName}</Text>
-                                                                    </View>
-                                                                </View>
 
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>商品数量:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.goodsNum}</Text>
-                                                                    </View>
-                                                                </View>
-
-
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>商品单价:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.goodsPrice}元</Text>
-                                                                    </View>
-                                                                </View>
-
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>配货:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <TextInput
-                                                                            placeholder={'请填写配货数量'}
-                                                                            style={[styles.teCor,]}
-                                                                            underlineColorAndroid="transparent"
-                                                                            onChangeText={(matchNum) => this.setState({matchNum})}
-                                                                        />
-                                                                    </View>
-                                                                </View>
 
                                                             </ScrollView>
 
 
 
-                                                            <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
-                                                                <TouchableHighlight onPress={this.matchOrSendGoods1} underlayColor="#f96f59" style={{width:100,padding:10,backgroundColor:"orange",borderRadius:5,alignItems:"center",justifyContent:"center",}}>
-                                                                    <Text style={{color:"#fff"}}>配货</Text>
-                                                                </TouchableHighlight>
 
-                                                            </View>
 
 
                                                         </View>:
@@ -1489,84 +1508,90 @@ const RoomInfo2 = props => {
 
                                                             <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
 
+                                                                <View style={{paddingBottom:this.state.padd}}>
+                                                                    <View style={{borderLeftWidth:3,borderLeftColor:'#f96f59',marginTop:15}}>
+                                                                        <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>商品信息</Text>
+                                                                    </View>
 
-                                                                <View style={{borderLeftWidth:3,borderLeftColor:'#f96f59',marginTop:15}}>
-                                                                    <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>商品信息</Text>
-                                                                </View>
-
-                                                                <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
+                                                                    <View style={{width:"100%",height:1,backgroundColor:"#ffdac7",marginTop:10}}></View>
 
 
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>货号:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.goodsNo}</Text>
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>货号:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.goodsNo}</Text>
+                                                                        </View>
+                                                                    </View>
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>商品尺码:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.modelName}</Text>
+                                                                        </View>
+                                                                    </View>
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>商品数量:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.goodsNum}</Text>
+                                                                        </View>
+                                                                    </View>
+
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>商品单价:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Text style={{flex:1}}>{details.goodsPrice}元</Text>
+                                                                        </View>
+                                                                    </View>
+
+
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>快递:</Text>
+
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <Picker
+                                                                                data={this.state.templateList}
+                                                                                cols={1}
+                                                                                extra={'请选择快递'}
+                                                                                value={this.state.templateListValue}
+                                                                                onChange={value => {this.setState({templateListValue:value})}}
+                                                                                className="forss">
+                                                                                <RoomInfo2></RoomInfo2>
+                                                                            </Picker>
+                                                                        </View>
+
+                                                                    </View>
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>快递单号:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <TextInput
+                                                                                placeholder={'请填写快递单号'}
+                                                                                onFocus={this.focus}
+                                                                                style={[styles.teCor,]}
+                                                                                underlineColorAndroid="transparent"
+                                                                                onChangeText={(postNo) => this.setState({postNo})}
+                                                                            />
+                                                                        </View>
+                                                                    </View>
+                                                                    <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
+                                                                        <TouchableHighlight onPress={this.matchOrSendGoods2} underlayColor="#f96f59" style={{width:100,padding:10,backgroundColor:"orange",borderRadius:5,alignItems:"center",justifyContent:"center",}}>
+                                                                            <Text style={{color:"#fff"}}>发货</Text>
+                                                                        </TouchableHighlight>
+
                                                                     </View>
                                                                 </View>
 
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>商品尺码:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.modelName}</Text>
-                                                                    </View>
-                                                                </View>
-
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>商品数量:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.goodsNum}</Text>
-                                                                    </View>
-                                                                </View>
 
 
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>商品单价:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Text style={{flex:1}}>{details.goodsPrice}元</Text>
-                                                                    </View>
-                                                                </View>
-
-
-
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>快递:</Text>
-
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <Picker
-                                                                            data={this.state.templateList}
-                                                                            cols={1}
-                                                                            extra={'请选择快递'}
-                                                                            value={this.state.templateListValue}
-                                                                            onChange={value => {this.setState({templateListValue:value})}}
-                                                                            className="forss">
-                                                                            <RoomInfo2></RoomInfo2>
-                                                                        </Picker>
-                                                                    </View>
-
-                                                                </View>
-
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>快递单号:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <TextInput
-                                                                            placeholder={'请填写快递单号'}
-                                                                            style={[styles.teCor,]}
-                                                                            underlineColorAndroid="transparent"
-                                                                            onChangeText={(postNo) => this.setState({postNo})}
-                                                                        />
-                                                                    </View>
-                                                                </View>
 
                                                             </ScrollView>
 
 
 
-                                                            <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
-                                                                <TouchableHighlight onPress={this.matchOrSendGoods2} underlayColor="#f96f59" style={{width:100,padding:10,backgroundColor:"orange",borderRadius:5,alignItems:"center",justifyContent:"center",}}>
-                                                                    <Text style={{color:"#fff"}}>发货</Text>
-                                                                </TouchableHighlight>
 
-                                                            </View>
 
 
                                                         </View>

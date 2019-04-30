@@ -12,7 +12,7 @@ import topBg from "../HomePage/style/topBg.png";
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {getData} from "../../components/active/reducer";
+import {getData,setRoleStr} from "../../components/active/reducer";
 
 import read from './style/read.png'
 import unread from './style/unread.png'
@@ -301,13 +301,67 @@ class ReadMessage extends React.Component {
         console.log(item,'publishpublishpublishpublishpublishpublish');
         const { navigate } = this.props.navigation;
 
+        if(item.tradeType==15){
+            const {roleStr} = this.props.reduxData;
+            console.log(roleStr,'roleStr');
+            let aa = {
+                goodsNo:item.tradeNo,
 
-        let data = {};
-        data.publishId = item.tradeNo;
+            }
 
-        navigate((item.tradeType==-1||item.tradeType==-2||item.tradeType==-3)?'WalletDetail':(item.tradeType==1||item.tradeType==2||item.tradeType==3||item.tradeType==4||item.tradeType==5||item.tradeType==6||item.tradeType==7)?'GoodSelect':(item.tradeType==8||item.tradeType==9)?'Order':'Publish',{ messageJump: data });
+            if(roleStr==2){
+                let data = {
+                    isApp: 1,
+                    role: 1
+                }
+                axios.get(`/user/changeUserRole`,data,
+                )
+                    .then((response) =>{
+                        console.log(response);
 
-    };
+                        if(response.data.code==0){
+                            global.roleStr = data.role;
+                            // console.log('2313123213123123123',data.role);
+                            // Toast.info(`切换${data.role==1?'买家':'卖家'}成功`)
+                            this.props.setRoleStr(data.role);
+                            navigate('TabHome',{ getSearchShop: aa });
+                            storage.load({ //读取tokenKey
+                                key: 'username',
+                                autoSync: false
+                            }).then(ret => {
+                                ret.roleStr = data.role;
+
+                                storage.save({
+                                    key: 'username',  // 注意:请不要在key中使用_下划线符号!
+                                    //data是你想要存储在本地的storage变量，这里的data只是一个示例。如果你想存一个叫item的对象，那么可以data: item，这样使用
+                                    data:ret,
+                                    // 如果不指定过期时间，则会使用defaultExpires参数
+                                    // 如果设为null，则永不过期
+                                    expires: null
+                                });
+                            }).catch((error) => {
+                            });
+                        }else {
+                            Toast.info(response.data.message)
+                        }
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+            }else {
+                navigate('TabHome',{ getSearchShop: aa });
+            }
+        }else {
+            let data = {};
+            data.publishId = item.tradeNo;
+
+            navigate((item.tradeType==-1||item.tradeType==-2||item.tradeType==-3)?'WalletDetail':(item.tradeType==1||item.tradeType==2||item.tradeType==3||item.tradeType==4||item.tradeType==5||item.tradeType==6||item.tradeType==7)?'GoodSelect':(item.tradeType==8||item.tradeType==9)?'Order':'Publish',{ messageJump: data });
+
+
+        }
+
+        };
 
 
 
@@ -491,6 +545,6 @@ const styles = StyleSheet.create({
 
 export default connect (
     state => ({reduxData: state.reduxData}),
-    dispath => bindActionCreators({getData},dispath)
+    dispath => bindActionCreators({getData,setRoleStr},dispath)
 )(ReadMessage)
 

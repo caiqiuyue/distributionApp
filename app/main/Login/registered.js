@@ -14,6 +14,8 @@ import lockIcon from './style/lockIcon.png'
 import phoneIcon from './style/phoneIcon.png'
 import eye_close from './style/eye_close.png'
 import eye_open from './style/eye_open.png'
+import qq from './style/QQ.png'
+import wechat from './style/wechat.png'
 import companyPhone from './style/companyPhone.png'
 import email from './style/email.png'
 import yzm from './style/yzm.png'
@@ -37,6 +39,8 @@ export default class Login extends Component {
             phone: '',
             codeSMS: '',
             password: '',
+            wechat: '',
+            qq: '',
             userNameType: false,
             passwordType: false,
             url:"",
@@ -247,6 +251,8 @@ export default class Login extends Component {
                 storeLink: this.state.companyPhone,
                 sex: this.state.sex,
                 role: this.state.roleStr,
+                wechat: this.state.wechat,
+                qq: this.state.qq,
                 email: this.state.email,
             })
                 .then(function (response) {
@@ -615,6 +621,37 @@ export default class Login extends Component {
                                                 </View>
 
                                             </View>
+                                            <View style={{marginTop:10,flexDirection:"row",padding:5,borderBottomColor:"#d49a98",borderBottomWidth:2}}>
+                                                <View style={{justifyContent:'center',}}><Image source={qq} style={styles.iconImg}/></View>
+                                                <View style={{justifyContent:'center',alignItems:"center",marginLeft:10}}>
+                                                    <TextInput
+                                                        placeholder="请输入qq号"
+                                                        style={{minWidth:300,padding:5}}
+                                                        onFocus={this.focus}
+                                                        underlineColorAndroid="transparent"
+                                                        autoCapitalize={'none'}
+                                                        onChangeText={(qq) => this.setState({qq})}
+                                                    >
+                                                    </TextInput>
+                                                </View>
+
+                                            </View>
+
+                                            <View style={{marginTop:10,flexDirection:"row",padding:5,borderBottomColor:"#d49a98",borderBottomWidth:2}}>
+                                                <View style={{justifyContent:'center',}}><Image source={wechat} style={styles.iconImg}/></View>
+                                                <View style={{justifyContent:'center',alignItems:"center",marginLeft:10}}>
+                                                    <TextInput
+                                                        placeholder="请输入微信号"
+                                                        style={{minWidth:300,padding:5}}
+                                                        onFocus={this.focus}
+                                                        underlineColorAndroid="transparent"
+                                                        autoCapitalize={'none'}
+                                                        onChangeText={(wechat) => this.setState({wechat})}
+                                                    >
+                                                    </TextInput>
+                                                </View>
+
+                                            </View>
 
                                             <View style={{marginTop:10,flexDirection:"row",padding:5,borderBottomColor:"#d49a98",borderBottomWidth:2}}>
                                                 <View style={{justifyContent:'center',}}><Image source={companyPhone} style={styles.iconImg}/></View>
@@ -669,6 +706,16 @@ export default class Login extends Component {
 
                                             </View>
 
+                                            <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,marginTop:20}}>
+                                                <TouchableHighlight
+                                                    style={{padding:10,alignItems:"center",justifyContent:"center",width:100}}
+                                                    underlayColor="transparent"
+                                                    onPress={this.handleSubmit}
+                                                >
+                                                    <Text style={{color:"#fff",fontSize:16,fontWeight:"bold"}}>注册</Text>
+                                                </TouchableHighlight>
+                                            </LinearGradient>
+
 
                                         </View>
                                     </View>
@@ -677,15 +724,7 @@ export default class Login extends Component {
                         </ScrollView>
                     </View>
 
-                    <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,marginTop:20}}>
-                        <TouchableHighlight
-                            style={{padding:10,alignItems:"center",width:100}}
-                            underlayColor="transparent"
-                            onPress={this.handleSubmit}
-                        >
-                            <Text style={{color:"#fff",fontSize:16,fontWeight:"bold"}}>注册</Text>
-                        </TouchableHighlight>
-                    </LinearGradient>
+
 
 
 

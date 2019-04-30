@@ -1238,7 +1238,7 @@ class ReadMessage extends React.Component {
                                                         </View>
 
                                                         <View style={styles.a}>
-                                                            <Text style={styles.f}>价格:</Text>
+                                                            <Text style={styles.f}>吊牌价:</Text>
                                                             <View style={[styles.b,{flex:3}]}>
                                                                 <TextInput
                                                                     placeholder={this.publish?this.state.price+'':'请填写商品价格'}
@@ -1377,7 +1377,6 @@ class ReadMessage extends React.Component {
                                                 <View>
                                                     <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
                                                         <View style={{padding:10,paddingBottom:this.state.padd}}>
-
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}><Text style={{color:"red"}}>*</Text>类型:</Text>
                                                                 <View style={[styles.b,{flex:3,flexDirection:'row'}]}>
@@ -1398,6 +1397,9 @@ class ReadMessage extends React.Component {
                                                                     }
                                                                 </View>
                                                             </View>
+
+                                                            <Text style={{color:"red",marginTop:10,fontWeight:"bold"}}>请务必填写货号 尺码 价格 数量 4要素</Text>
+
 
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>信息:</Text>
@@ -1735,7 +1737,7 @@ class ReadMessage extends React.Component {
 
                                             <View style={{flex:1}}>
                                                 <Text style={{fontWeight:"bold"}}>{item.content}</Text>
-                                                <Text style={{color:"grey",marginTop:5}}>{`尺码:${item.model}, 价格:${item.price}, 货号:${item.goodsNo}, 数量:${item.saleNum}`}</Text>
+                                                <Text style={{color:"grey",marginTop:5}}>{`尺码:${item.model}, 吊牌价:${item.price}, 货号:${item.goodsNo}, 数量:${item.saleNum}`}</Text>
                                             </View>
                                             <TouchableHighlight underlayColor="transparent" onPress={()=>{this.publishItem(item,true)}} style={{justifyContent:"center"}}>
                                                 <Text style={{color:"red",textDecorationLine:"underline"}}>{item.status==0?'待审核':item.status==1?'已审核':'驳回'}></Text>

@@ -202,6 +202,20 @@ export default class Mine extends React.Component {
             .then((response) =>{
                 console.log(response);
                 alert(response.data.code==0?'设置成功':response.data.message)
+                axios.get(`/account/getAccount`,{},
+                )
+                    .then((response) =>{
+                        console.log(response);
+                        if(response.data.code==0){
+                            this.setState({
+                                data:response.data.data
+                            })
+                        }
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
 
             })
             .catch(function (error) {

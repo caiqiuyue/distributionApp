@@ -401,6 +401,10 @@ const RoomInfo2 = props => {
                              address:response.data.data.address,
                              phone:response.data.data.phone,
                          }
+                         details.goodsState = response.data.data.goodsState
+                         details.postState = response.data.data.postState
+                         details.orderState = response.data.data.orderState
+                         details.capitalState = response.data.data.capitalState
                          this.setState({
                              details
                          })
@@ -1128,7 +1132,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>订单状态:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.orderState==-1?'删除':details.orderState==1?'买家新建':details.orderState==2?'卖家反馈中':details.orderState==3?'买家撤销':details.orderState==4?'卖家接受':details.orderState==5?'卖家拒绝':details.details==6?'订单异议':details.details==7?'订单完成':'订单关闭'}</Text>
+                                                                    <Text style={{flex:1}}>{details.orderState==-1?'删除':details.orderState==1?'买家新建':details.orderState==2?'卖家反馈中':details.orderState==3?'买家撤销':details.orderState==4?'卖家接受':details.orderState==5?'卖家拒绝':details.orderState==6?'订单异议':details.orderState==7?'订单完成':'订单关闭'}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1140,9 +1144,15 @@ const RoomInfo2 = props => {
                                                             </View>
 
                                                             <View style={styles.a}>
-                                                                <Text style={styles.f}>备注:</Text>
+                                                                <Text style={styles.f}>买家备注:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
                                                                     <Text style={{flex:1}}>{details.remark}</Text>
+                                                                </View>
+                                                            </View>
+                                                            <View style={styles.a}>
+                                                                <Text style={styles.f}>卖家备注:</Text>
+                                                                <View style={[styles.b,{flex:3}]}>
+                                                                    <Text style={{flex:1}}>{details.orderDesc}</Text>
                                                                 </View>
                                                             </View>
 
@@ -1178,9 +1188,28 @@ const RoomInfo2 = props => {
                                                                     <Text style={{color:"#fff"}}>撤销订单</Text>
                                                                 </TouchableHighlight>
                                                             </LinearGradient>
+                                                        </View>}
+
+                                                        {/*{details.orderState==4&&*/}
+                                                        {/*<View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>*/}
+
+                                                            {/*<LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>*/}
+                                                                {/*<TouchableHighlight onPress={()=>{this.setState({modal:'退货',orderState:3,processType:[],problemType:[],reasonReturnGoods:null})}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>*/}
+                                                                    {/*<Text style={{color:"#fff"}}>退货</Text>*/}
+                                                                {/*</TouchableHighlight>*/}
+                                                            {/*</LinearGradient>*/}
+                                                        {/*</View>}*/}
 
 
 
+                                                        {(!/6|8|1|-1/.test(details.orderState))&&
+                                                        <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
+
+                                                            <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                <TouchableHighlight onPress={()=>{this.setState({modal:'退货',orderState:3,processType:[],problemType:[],reasonReturnGoods:null})}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                    <Text style={{color:"#fff"}}>申请售后</Text>
+                                                                </TouchableHighlight>
+                                                            </LinearGradient>
                                                         </View>}
 
                                                         {details.postState==1&&
@@ -1191,13 +1220,6 @@ const RoomInfo2 = props => {
                                                                     <Text style={{color:"#fff"}}>确认收货</Text>
                                                                 </TouchableHighlight>
                                                             </LinearGradient>
-
-                                                            <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
-                                                                <TouchableHighlight onPress={()=>{this.setState({modal:'退货',orderState:3,processType:[],problemType:[],reasonReturnGoods:null})}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
-                                                                    <Text style={{color:"#fff"}}>退货</Text>
-                                                                </TouchableHighlight>
-                                                            </LinearGradient>
-
 
                                                         </View>}
 
@@ -1214,35 +1236,39 @@ const RoomInfo2 = props => {
 
                                                         <View>
                                                             <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
-                                                                <Text style={{marginTop:10}}>{this.state.orderState==1?"确定要删除吗？":'确定要撤销吗？'}</Text>
+
+                                                                <View style={{paddingBottom:this.state.padd}}>
+                                                                    <Text style={{marginTop:10}}>{this.state.orderState==1?"确定要删除吗？":'确定要撤销吗？'}</Text>
+
+                                                                    <View style={styles.a}>
+                                                                        <Text style={styles.f}>原因:</Text>
+                                                                        <View style={[styles.b,{flex:3}]}>
+                                                                            <TextInput
+                                                                                placeholder={this.state.orderState==1?"请填写删除原因":'请填写撤销原因？'}
+                                                                                multiline={true}
+                                                                                onFocus={this.focus}
+                                                                                style={[styles.teCor,{height:100,}]}
+                                                                                underlineColorAndroid="transparent"
+                                                                                onChangeText={(reason) => this.setState({reason})}
+                                                                            />
+                                                                        </View>
+                                                                    </View>
 
 
+                                                                    <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
 
-                                                                <View style={styles.a}>
-                                                                    <Text style={styles.f}>原因:</Text>
-                                                                    <View style={[styles.b,{flex:3}]}>
-                                                                        <TextInput
-                                                                            placeholder={this.state.orderState==1?"请填写删除原因":'请填写撤销原因？'}
-                                                                            multiline={true}
-                                                                            style={[styles.teCor,{height:100,}]}
-                                                                            underlineColorAndroid="transparent"
-                                                                            onChangeText={(reason) => this.setState({reason})}
-                                                                        />
+
+                                                                        <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                            <TouchableHighlight onPress={()=>{this.cancelOrder()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                                <Text style={{color:"#fff"}}>确定</Text>
+                                                                            </TouchableHighlight>
+                                                                        </LinearGradient>
+
+
                                                                     </View>
                                                                 </View>
 
 
-                                                                <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
-
-
-                                                                    <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
-                                                                        <TouchableHighlight onPress={()=>{this.cancelOrder()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
-                                                                            <Text style={{color:"#fff"}}>确定</Text>
-                                                                        </TouchableHighlight>
-                                                                    </LinearGradient>
-
-
-                                                                </View>
                                                             </ScrollView>
                                                         </View>
 
@@ -1256,64 +1282,71 @@ const RoomInfo2 = props => {
 
                                                             <View>
                                                                 <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
-                                                                    <View style={styles.a}>
-                                                                        <Text style={styles.f}>处理方式:</Text>
-                                                                        <View style={[styles.b,{flex:3}]}>
-                                                                            <Picker
-                                                                                data={this.state.processTypeList}
-                                                                                cols={1}
-                                                                                extra={'请选择处理方式'}
-                                                                                value={this.state.processType}
-                                                                                onChange={value => {this.setState({processType:value})}}
-                                                                                className="forss">
-                                                                                <RoomInfo2></RoomInfo2>
-                                                                            </Picker>
-                                                                        </View>
-                                                                    </View>
 
-                                                                    <View style={styles.a}>
-                                                                        <Text style={styles.f}>问题类型:</Text>
-                                                                        <View style={[styles.b,{flex:3}]}>
-                                                                            <Picker
-                                                                                data={this.state.problemTypeList}
-                                                                                cols={1}
-                                                                                extra={'请选择问题类型'}
-                                                                                value={this.state.problemType}
-                                                                                onChange={value => {this.setState({problemType:value})}}
-                                                                                className="forss">
-                                                                                <RoomInfo2></RoomInfo2>
-                                                                            </Picker>
+                                                                    <View style={{paddingBottom:this.state.padd}}>
+                                                                        <View style={styles.a}>
+                                                                            <Text style={styles.f}>处理方式:</Text>
+                                                                            <View style={[styles.b,{flex:3}]}>
+                                                                                <Picker
+                                                                                    data={this.state.processTypeList}
+                                                                                    cols={1}
+                                                                                    extra={'请选择处理方式'}
+                                                                                    value={this.state.processType}
+                                                                                    onChange={value => {this.setState({processType:value})}}
+                                                                                    className="forss">
+                                                                                    <RoomInfo2></RoomInfo2>
+                                                                                </Picker>
+                                                                            </View>
                                                                         </View>
 
-                                                                    </View>
+                                                                        <View style={styles.a}>
+                                                                            <Text style={styles.f}>问题类型:</Text>
+                                                                            <View style={[styles.b,{flex:3}]}>
+                                                                                <Picker
+                                                                                    data={this.state.problemTypeList}
+                                                                                    cols={1}
+                                                                                    extra={'请选择问题类型'}
+                                                                                    value={this.state.problemType}
+                                                                                    onChange={value => {this.setState({problemType:value})}}
+                                                                                    className="forss">
+                                                                                    <RoomInfo2></RoomInfo2>
+                                                                                </Picker>
+                                                                            </View>
 
-                                                                    <View style={styles.a}>
-                                                                        <Text style={styles.f}>退货原因:</Text>
-                                                                        <View style={[styles.b,{flex:3}]}>
-                                                                            <TextInput
-                                                                                placeholder={'请填写退货原因'}
-                                                                                multiline={true}
-                                                                                style={[styles.teCor,{height:100,}]}
-                                                                                underlineColorAndroid="transparent"
-                                                                                onChangeText={(reasonReturnGoods) => this.setState({reasonReturnGoods})}
-                                                                            />
                                                                         </View>
+
+                                                                        <View style={styles.a}>
+                                                                            <Text style={styles.f}>退货原因:</Text>
+                                                                            <View style={[styles.b,{flex:3}]}>
+                                                                                <TextInput
+                                                                                    placeholder={'请填写退货原因'}
+                                                                                    multiline={true}
+                                                                                    onFocus={this.focus}
+                                                                                    style={[styles.teCor,{height:100,}]}
+                                                                                    underlineColorAndroid="transparent"
+                                                                                    onChangeText={(reasonReturnGoods) => this.setState({reasonReturnGoods})}
+                                                                                />
+                                                                            </View>
+                                                                        </View>
+
+
+                                                                        <AddPic  addPic={this.addPic}/>
                                                                     </View>
 
+                                                                    <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
+                                                                        <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                            <TouchableHighlight onPress={()=>{this.submitReturnGoods()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                                <Text style={{color:"#fff"}}>确定</Text>
+                                                                            </TouchableHighlight>
+                                                                        </LinearGradient>
+                                                                    </View>
 
-                                                                    <AddPic  addPic={this.addPic}/>
 
                                                                 </ScrollView>
 
 
 
-                                                                <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
-                                                                    <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
-                                                                        <TouchableHighlight onPress={()=>{this.submitReturnGoods()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
-                                                                            <Text style={{color:"#fff"}}>确定</Text>
-                                                                        </TouchableHighlight>
-                                                                    </LinearGradient>
-                                                                </View>
+
                                                             </View>
 
 

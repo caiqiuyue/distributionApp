@@ -60,6 +60,31 @@ export default class Mine extends React.Component {
                 console.log(error);
             })
 
+
+        axios.get(`/account/getWithdrawTypeAndCard`,{},
+        )
+            .then((response) =>{
+                console.log(response,'查询最后一次提现方式和卡号');
+                if(response.data.code==0&&response.data.data){
+                    let way = [];
+                    response.data.data.bankName.indexOf('微信')!==-1?way[0]='1':response.data.data.bankName.indexOf('支付宝')!==-1?way[0]='2':way[0]='3'
+                    this.setState({
+                        way,
+                        cardType:response.data.data.bankName,
+                        name:response.data.data.accountName,
+                        bankcardNo:response.data.data.bankNo,
+                    },()=>{
+                        console.log(this.state.bankName,'bankName');
+                        console.log(this.state.accountName,'accountName');
+                        console.log(this.state.way,'way');
+                    })
+                }
+
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+
     }
 
     comfirmSelected = ()=>{
@@ -79,6 +104,20 @@ export default class Mine extends React.Component {
                 console.log(response);
 
                 Toast.info(response.data.code==0?'提现成功':response.data.message)
+                axios.get(`/account/getAccount`,{},
+                )
+                    .then((response) =>{
+                        console.log(response);
+                        if(response.data.code==0){
+                            this.setState({
+                                data:response.data.data
+                            })
+                        }
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
 
             })
             .catch(function (error) {
@@ -241,7 +280,7 @@ export default class Mine extends React.Component {
                                             // value={this.state.username}
                                             style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
                                             underlineColorAndroid="transparent"
-                                            // value={this.bankNumRep(this.state.bankcardNo)}
+                                            value={this.state.bankcardNo}
                                             onChangeText={(bankcardNo) => this.setState({bankcardNo})}
                                         >
                                         </TextInput>
@@ -251,7 +290,8 @@ export default class Mine extends React.Component {
                                     <Text style={{flex:1}}>真实姓名:</Text>
                                     <View style={[styles.b,{flex:3}]}>
                                         <TextInput
-                                            placeholder={'转账验证需用'}
+                                            placeholder={this.state.name?this.state.name:'转账验证需用'}
+                                            placeholderTextColor={this.state.name?"#000":'#ccc'}
                                             // value={this.state.username}
                                             style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
                                             underlineColorAndroid="transparent"
@@ -266,8 +306,9 @@ export default class Mine extends React.Component {
                                     <Text style={{flex:1}}>账户名称:</Text>
                                     <View style={[styles.b,{flex:3}]}>
                                         <TextInput
-                                            placeholder={'请输入账户名称'}
                                             // value={this.state.username}
+                                            placeholder={this.state.name?this.state.name:'请输入账户名称'}
+                                            placeholderTextColor={this.state.name?"#000":'#ccc'}
                                             style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
                                             underlineColorAndroid="transparent"
                                             onChangeText={(name) => this.setState({name})}

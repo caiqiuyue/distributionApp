@@ -354,7 +354,7 @@ export default class App extends React.Component {
                             item.postId = val[0];
                             item.postFee = 0;
                             item.postName = item.templateList.filter(_item=>_item.value==val[0])[0].label;
-                            item.goodsAmount = (_val.authenticateFee-0)+(item.postFee-0)+(item.salePrice-0)*item.stockNo;
+                            item.goodsAmount = ((_val.authenticateFee-0)*(item.stockNo-0))+(item.postFee-0)+(item.salePrice-0)*item.stockNo;
                         });
                         _val.models.map(item=>{
                             totalMoney += item.goodsAmount * 1
@@ -443,7 +443,7 @@ export default class App extends React.Component {
                                 item.postId = val[0]
                                 item.postFee = response.data.data.postFee
                                 item.postName = templateList.filter(item=>item.value==val[0])[0].label
-                                item.goodsAmount = (item.postFee-0)+(item.salePrice-0)*item.stockNo
+                                item.goodsAmount = (item.postFee-0)+((item.salePrice-0)*item.stockNo)+((_item.authenticateFee-0)*(item.stockNo-0))
 
                             }
 
@@ -620,8 +620,9 @@ export default class App extends React.Component {
                 a.modelId = item.modelId
                 a.goodsNum = item.stockNo
                 a.goodsPrice = (item.salePrice-0)
-                a.goodsAmount = ((item.salePrice-0)*(item.stockNo-0))+(item.postFee-0)
+                a.goodsAmount = ((item.salePrice-0)*(item.stockNo-0))+(item.postFee-0)+((_item.authenticateFee-0)*(item.stockNo-0))
                 a.channelId = _item.channelId
+                a.authenticateFee = _item.authenticateFee * item.stockNo
                 a.goodsId = _item.goodsId
                 a.goodsNo = _item.goodsNo
                 a.sellerId = _item.sellerId
@@ -708,7 +709,7 @@ export default class App extends React.Component {
                         console.log(response);
                         if(response.data.code==0){
                             val.postFee = response.data.data.postFee
-                            val.goodsAmount = (val.postFee-0)+(val.salePrice-0)*val.stockNo
+                            val.goodsAmount = (val.postFee-0)+(_item.authenticateFee-0)*val.stockNo+(val.salePrice-0)*val.stockNo
                             console.log(val, _item);
                             _models.push(val);
                             totalMoney += val.goodsAmount
@@ -1042,7 +1043,7 @@ export default class App extends React.Component {
 
                                                     </View>
                                                     <View style={{flex:1,justifyContent:"center",alignItems:"center"}}><Text>邮费:<Text style={{color:"orange"}}>{item.postFee}元</Text></Text></View>
-                                                    <View  style={{flex:1,justifyContent:"center"}}><Text>鉴定费:<Text style={{color:"orange"}}>{_item.authenticateFee}元</Text></Text></View>
+                                                    <View  style={{flex:1,justifyContent:"center"}}><Text>鉴定费:<Text style={{color:"orange"}}>{_item.authenticateFee*item.stockNo}元</Text></Text></View>
 
                                                 </View>
                                                 <DashLine/>

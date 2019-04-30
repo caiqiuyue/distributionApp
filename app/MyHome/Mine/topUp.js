@@ -16,7 +16,7 @@ export default class Mine extends React.Component {
         this.state={
             data:{},
             amount:null,
-            zfb:null,
+            zfb:null,padd:30
         }
 
     }
@@ -24,6 +24,7 @@ export default class Mine extends React.Component {
 
 
     componentWillMount(){
+
 
     }
 
@@ -132,6 +133,13 @@ export default class Mine extends React.Component {
 
     };
 
+    focus=()=>{
+
+        this.setState({
+            padd:Dimensions.get("window").height-200,
+        })
+    }
+
 
     render(){
 
@@ -140,72 +148,77 @@ export default class Mine extends React.Component {
 
 
 
-                <View style={{height:Dimensions.get("window").height,backgroundColor:"#fff",padding:30,}}>
+                <View  style={{height:Dimensions.get("window").height,backgroundColor:"#fff"}}>
+
+                    <ScrollView>
+                        <View style={{padding:30,paddingBottom:this.state.padd}}>
+                            <View style={styles.a}>
+                                <Text style={{flex:1}}>支付宝订单号:</Text>
+                                <View style={[styles.b,{flex:3}]}>
+                                    <TextInput
+                                        placeholder={'请输入支付宝交易订单号'}
+                                        // value={this.state.username}
+                                        style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
+                                        underlineColorAndroid="transparent"
+                                        onChangeText={(zfb) => this.setState({zfb})}
+                                    >
+                                    </TextInput>
+                                </View>
+                            </View>
 
 
-                    <View style={styles.a}>
-                        <Text style={{flex:1}}>支付宝订单号:</Text>
-                        <View style={[styles.b,{flex:3}]}>
-                            <TextInput
-                                placeholder={'请输入支付宝交易订单号'}
-                                // value={this.state.username}
-                                style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
-                                underlineColorAndroid="transparent"
-                                onChangeText={(zfb) => this.setState({zfb})}
-                            >
-                            </TextInput>
+                            <View style={styles.a}>
+                                <Text style={{flex:1}}>充值金额:</Text>
+                                <View style={[styles.b,{flex:3}]}>
+                                    <TextInput
+                                        placeholder={'请输入充值金额'}
+                                        keyboardType='numeric'
+                                        // value={this.state.username}
+                                        style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
+                                        underlineColorAndroid="transparent"
+                                        onFocus={this.focus}
+                                        onChangeText={(amount) => this.setState({amount})}
+                                    >
+                                    </TextInput>
+                                </View>
+                            </View>
+
+                            <View style={styles.a}>
+                                <Text style={{flex:1}}>充值说明:</Text>
+                                <View style={[styles.b,{flex:3}]}>
+                                    <Text style={{color:"grey"}}>1.请扫描下方二维码进行转账。</Text>
+                                    <Text style={{color:"grey"}}>2.转账成功后，将支付宝交易号复制到输入框。</Text>
+                                    <Text style={{color:"grey"}}>3.填写转账金额并确认。</Text>
+                                </View>
+                            </View>
+
+                            <View style={styles.a}>
+                                <Text style={{flex:1}}>充值二维码:</Text>
+
+                                <TouchableHighlight onLongPress={()=>this.saveImg('http://39.105.201.251/static/img/alipay.c3ed1e6.png')} style={[styles.b,{flex:3}]}>
+                                    <Image source={{uri:'http://39.105.201.251/static/img/alipay.c3ed1e6.png'}}
+                                           style={{width:"100%",height:230,resizeMode:"stretch"}}/>
+                                </TouchableHighlight>
+
+
+                            </View>
+
+
+                            <View style={{alignItems:"center",marginTop:10}}>
+                                <LinearGradient colors={['#f96f59', '#f94939']} style={{width:100,borderRadius:5}}>
+                                    <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
+                                        alignItems:"center"
+                                    }} onPress={this.submit }>
+                                        <Text
+                                            style={{fontSize:16,textAlign:"center",color:"#fff"}}>
+                                            确定
+                                        </Text>
+                                    </TouchableHighlight>
+                                </LinearGradient>
+                            </View>
                         </View>
-                    </View>
 
-
-                    <View style={styles.a}>
-                        <Text style={{flex:1}}>充值金额:</Text>
-                        <View style={[styles.b,{flex:3}]}>
-                            <TextInput
-                                placeholder={'请输入充值金额'}
-                                keyboardType='numeric'
-                                // value={this.state.username}
-                                style={{minWidth:'100%',padding:10,backgroundColor:"#f0f0f0",borderRadius:5,}}
-                                underlineColorAndroid="transparent"
-                                onChangeText={(amount) => this.setState({amount})}
-                            >
-                            </TextInput>
-                        </View>
-                    </View>
-
-                    <View style={styles.a}>
-                        <Text style={{flex:1}}>充值说明:</Text>
-                        <View style={[styles.b,{flex:3}]}>
-                            <Text style={{color:"grey"}}>1.请扫描下方二维码进行转账。</Text>
-                            <Text style={{color:"grey"}}>2.转账成功后，将支付宝交易号复制到输入框。</Text>
-                            <Text style={{color:"grey"}}>3.填写转账金额并确认。</Text>
-                        </View>
-                    </View>
-
-                    <View style={styles.a}>
-                        <Text style={{flex:1}}>充值二维码:</Text>
-
-                        <TouchableHighlight onLongPress={()=>this.saveImg('http://39.105.201.251/static/img/alipay.c3ed1e6.png')} style={[styles.b,{flex:3}]}>
-                            <Image source={{uri:'http://39.105.201.251/static/img/alipay.c3ed1e6.png'}}
-                                   style={{width:"100%",height:230,resizeMode:"stretch"}}/>
-                        </TouchableHighlight>
-
-
-                    </View>
-
-
-                    <View style={{alignItems:"center",marginTop:10}}>
-                        <LinearGradient colors={['#f96f59', '#f94939']} style={{width:100,borderRadius:5}}>
-                            <TouchableHighlight underlayColor={"transparent"} style={{padding:10,
-                                alignItems:"center"
-                            }} onPress={this.submit }>
-                                <Text
-                                    style={{fontSize:16,textAlign:"center",color:"#fff"}}>
-                                    确定
-                                </Text>
-                            </TouchableHighlight>
-                        </LinearGradient>
-                    </View>
+                    </ScrollView>
 
                 </View>
 

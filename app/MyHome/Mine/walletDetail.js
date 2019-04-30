@@ -228,7 +228,7 @@ export default class GoodSelect extends Component {
                  },()=>{
                      axios.post(`/account/searchWithdrawBill`,
                          {
-                             current:this.state.pages1,
+                             current:this.state.pages2,
                              pageSize:50,
                          },
 
