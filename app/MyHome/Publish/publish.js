@@ -1289,7 +1289,7 @@ class ReadMessage extends React.Component {
                                                         </View>
 
                                                         {
-                                                            (!this.publish && this.state.image)&&
+                                                            (!this.publish && this.state.image)?
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>图片:</Text>
                                                                 <View style={{flex:3}}>
@@ -1299,17 +1299,17 @@ class ReadMessage extends React.Component {
                                                                         />
                                                                     </View>
                                                                 </View>
-                                                            </View>
+                                                            </View>:<View/>
                                                         }
 
                                                         {
-                                                            (!this.publish&& this.state.image)&&
+                                                            (!this.publish&& this.state.image)?
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}></Text>
                                                                 <View style={{flex:3}}>
                                                                     <Text style={{color:'red'}}>如不使用上述图片 可自行上传图片</Text>
                                                                 </View>
-                                                            </View>
+                                                            </View>:<View/>
                                                         }
 
 
@@ -1659,13 +1659,13 @@ class ReadMessage extends React.Component {
                                                             <TouchableHighlight  style={{marginTop:5}} key={indexx} onPress={()=>{this.toastMsg(_item)}} underlayColor="transparent">
 
                                                                 <View>
-                                                                    <View  style={{flexDirection:"row"}}>
+                                                                    <View  style={{flexDirection:"row",flexWrap:"wrap"}}>
                                                                         <Text style={{color:"grey",textDecorationLine:"underline"}}>渠道:{_item.channelName}</Text>
                                                                         {
                                                                             _item.models.map((model,ii)=>
 
                                                                                 <View key={ii} style={{flexDirection:"row",marginLeft:10}}>
-                                                                                    <Text style={{color:"grey"}}>{model.modelName}--</Text>
+                                                                                    <Text style={{color:"grey"}}>{model.modelName}*</Text>
                                                                                     <Text style={{color:"#000"}}>{model.stockNum}件--</Text>
                                                                                     <Text style={{color:"red"}}>{model.salePrice}元</Text>
                                                                                 </View>

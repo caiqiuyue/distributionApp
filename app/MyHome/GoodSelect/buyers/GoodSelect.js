@@ -73,6 +73,7 @@ const RoomInfo2 = props => {
             noData:false,
             details:{},
             modal:"",
+            namee:"",
             padd:0,
             animationType: 'none',//none slide fade
             modalVisible: false,//模态场景是否可见
@@ -84,6 +85,17 @@ const RoomInfo2 = props => {
             channelName:null,
             name:null,
             phone:null,
+            channelId:[''],
+            sellerId:'',
+            goodsId:'',
+            modelId:'',
+            postId:[''],
+            postList:[],
+            postFee:'',
+            salePrice:'',
+            stockNum:'',
+            channelLists:[],
+            channelList:[],
             orderStatus:[
 
                 {
@@ -170,10 +182,15 @@ const RoomInfo2 = props => {
             ordStatu:[''],
             problemType:[''],
             processType:[''],
+            aaa:[]
 
 
         };
 
+        this.capitalState = ['待支付', '买家已付款', '平台托管', '平台解付中', '卖家已收款', '卖家已退款', '平台托管', '平台解付', '买家已收款']
+
+        this.postData = []
+        this.orderIds = ''
 
     }
 
@@ -199,7 +216,16 @@ const RoomInfo2 = props => {
 
      handelMsg=(item)=>{
 
-         let {handelMsg} = this.state;
+         let {handelMsg,finished,unfinished} = this.state;
+         finished.map(_item=>{
+             _item.flag=false
+         })
+
+         unfinished.map(_item=>{
+             _item.flag=false
+         })
+
+
 
          handelMsg.map((_item)=>{
              if(_item.value==item.value){
@@ -212,7 +238,8 @@ const RoomInfo2 = props => {
 
          this.setState({
              handelMsg,
-             changeMsg:item.value
+             changeMsg:item.value,
+             finished,unfinished,aaa:[]
          })
 
      }
@@ -380,8 +407,22 @@ const RoomInfo2 = props => {
      details=(item)=>{
 
 
-
+         this.postData = []
          this.setState({
+             channelName:null,
+             name:null,
+             phone:null,
+             channelId:[],
+             sellerId:'',
+             goodsId:'',
+             modelId:'',
+             postId:[],
+             postList:[],
+             postFee:'',
+             salePrice:'',
+             stockNum:'',
+             channelLists:[],
+             channelList:[],
              details: item,
              modalVisible: true,
              modal:"查看详情"
@@ -568,6 +609,53 @@ const RoomInfo2 = props => {
              })
      }
 
+     //制单支付
+     submitRetryPay = (orderIds)=>{
+         this.orderIds = orderIds
+         axios.get(`/order/orderPayView`,{
+             orderIds
+         },)
+             .then((response) =>{
+                 console.log(response);
+                 if(response.data.code==0){
+                     this.setState({
+                         payDatas:response.data.data,
+                         modal:"制单支付",
+                         modalVisible:true,
+                     })
+
+                 }else {
+                     alert(response.data.message)
+                 }
+             })
+             .catch(function (error) {
+                 console.log(error);
+             })
+     }
+
+     betchOrder = (item,data,namee)=>{
+         if(item.orderState!=1){
+             return
+         }
+         let aaa = []
+         let da = data.map(i=>{
+             if(i.orderId==item.orderId){
+                 i.flag=!i.flag
+             }
+             if(i.flag){
+                 aaa.push(i.orderId+'')
+             }
+             return i
+         })
+         console.log(aaa);
+         if(namee=='finished'){
+             this.setState({finished:da,aaa,namee})
+         }else {
+             this.setState({unfinished:da,aaa,namee})
+         }
+
+
+     }
 
      searchOrder = ()=>{
          this.setState({
@@ -688,6 +776,126 @@ const RoomInfo2 = props => {
          })
      }
 
+     getPostList=(channelList,channelId)=>{
+         let postList = []
+         channelList.map(item=>{
+             if(item.channelId==channelId){
+                 this.postData = item.postList
+                 item.postList.map(_item=>{
+                     let bbb = {
+                         label:_item.postName,
+                         value:_item.postId,
+                     }
+                     postList.push(bbb)
+                 })
+             }
+
+         })
+         return postList
+     }
+
+     submitRetryOrder = ()=>{
+         let {channelId,sellerId,goodsId,modelId,postId,postFee,salePrice} = this.state
+         if(!channelId[0]){
+             alert('请选择渠道')
+             return
+         }
+
+         if(!postId[0]){
+             alert('请选择快递')
+             return
+         }
+         axios.post(`/order/retryOrder`,{
+             orderId:this.state.details.orderId,
+             channelId:channelId[0],
+             postId:postId[0],sellerId,goodsId,modelId,postFee,salePrice
+
+         },)
+             .then((response) =>{
+                 console.log(response);
+                 if(response.data.code==0){
+                     this.onRefresh()
+                    this.submitRetryPay(response.data.data.newOrderId)
+                 }else {
+                     alert(response.data.message)
+                 }
+             })
+             .catch(function (error) {
+                 console.log(error);
+             })
+     }
+
+     //转单
+     retryOrder=()=>{
+
+         axios.get(`/order/getChannelByOrder`,{
+             orderId:this.state.details.orderId,
+         },)
+             .then((response) =>{
+                 console.log(response);
+                 if(response.data.code==0){
+                     let channelList =  response.data.data.channelList
+                     let channelLists = []
+                     if(channelList.length==0){
+                         alert('暂无渠道可重新制单')
+                     }else {
+                         channelList.map(item=>{
+                             let aaa = {
+                                 label:item.channelName,
+                                 value:item.channelId+'',
+                             }
+                             channelLists.push(aaa)
+                         })
+                     }
+                     this.setState({channelLists,channelList,modal:'转单',modalVisible:channelList.length!==0?true:false})
+
+
+                 }else {
+                     alert(response.data.message)
+                 }
+             })
+             .catch(function (error) {
+                 console.log(error);
+             })
+     }
+
+     getChannelDataName=(channelList, channelId, name)=>{
+         return channelList.filter(item => channelId == item.channelId)[0] && channelList.filter(item => channelId == item.channelId)[0][name];
+     }
+
+     getPostDataName=(postList, postId, name)=>{
+         return postList.filter(item => postId == item.postId)[0] && postList.filter(item => postId == item.postId)[0][name];
+     }
+
+     setChannel=(val)=>{
+         let {channelList} = this.state
+         console.log(val);
+         this.setState({
+             channelId:val,
+             salePrice:this.getChannelDataName(channelList,val[0],'salePrice'),
+             stockNum:this.getChannelDataName(channelList,val[0],'stockNum'),
+             sellerId:this.getChannelDataName(channelList,val[0],'sellerId'),
+             goodsId:this.getChannelDataName(channelList,val[0],'goodsId'),
+             modelId:this.getChannelDataName(channelList,val[0],'modelId'),
+             postList:this.getPostList(channelList,val[0]),
+             postId:[],
+             postFee:''
+         })
+     }
+
+     setPost=(val)=>{
+         console.log(val,'postId');
+         this.setState({
+             postId:val,
+             postFee:this.getPostDataName(this.postData,val[0],'postFee')
+         })
+     }
+
+     payOrders = ()=>{
+         let {aaa,} = this.state
+         this.submitRetryPay(aaa.join(','))
+     }
+
      Confirm = () => {
 
 
@@ -776,7 +984,13 @@ const RoomInfo2 = props => {
                                             <RoomInfo></RoomInfo>
                                         </Picker>
                                     </View>
-                                    <TouchableHighlight underlayColor="transparent" onPress={this.searchOrder} style={{alignItems:"center",justifyContent:"center",marginRight:10}}>
+                                    {this.state.aaa.length>1&&this.state.namee=='unfinished'?
+                                    <TouchableHighlight underlayColor="transparent" onPress={this.payOrders} style={{alignItems:"center",justifyContent:"center",marginRight:10}}>
+                                        <Text style={{color:"red",fontWeight:"bold",fontSize:16}}>批量支付</Text>
+                                    </TouchableHighlight>:null
+                                    }
+
+                                    <TouchableHighlight underlayColor="transparent" onPress={this.searchOrder} style={{alignItems:"center",justifyContent:"center",marginRight:20}}>
                                         <Image source={search} style={{width:20,height:20}}/>
                                     </TouchableHighlight>
                                 </View>
@@ -797,7 +1011,7 @@ const RoomInfo2 = props => {
 
                                             <TouchableHighlight  underlayColor="transparent" onPress={()=>{this.details(item)}}>
 
-                                                <View style={[styles.d,styles.e,]}>
+                                                <View style={[styles.d,styles.e,{backgroundColor:item.flag?'#fda095':'#fff'}]}>
 
                                                     <View  style={[{alignItems:"center",justifyContent:"center",flex:3}]}>
                                                         <Text style={{fontSize:18,fontWeight:"bold"}}>{item.goodsNo}</Text>
@@ -815,16 +1029,19 @@ const RoomInfo2 = props => {
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text style={{color:"grey"}}>总价</Text>
-                                                        <Text  style={{marginTop:5,fontSize:18,color:"orange"}}>{item.goodsAmount}元</Text>
+                                                        <Text  style={{marginTop:5,fontSize:18,color:item.flag?"#000":"orange"}}>{item.goodsAmount.toFixed(2)}元</Text>
                                                     </View>
 
-                                                    <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text>{item.consignee}</Text>
-                                                    </View>
+                                                    <TouchableHighlight style={[{flex:2,alignItems:"center",justifyContent:"center"}]} underlayColor="transparent" onPress={()=>{this.betchOrder(item,unfinished,'unfinished')}}>
+                                                        <View style={[{alignItems:"center",justifyContent:"center"}]}>
+                                                            <Text>{item.consignee}</Text>
+                                                            <Text style={{marginTop:5,color:"red"}}>{item.orderState==1?'批量支付':''}</Text>
+                                                        </View>
+                                                    </TouchableHighlight>
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text>{item.orderState==-1?'删除':item.orderState==1?'买家新建':item.orderState==2?'卖家反馈中':item.orderState==3?'买家撤销':item.orderState==4?'卖家接受':item.orderState==5?'卖家拒绝':item.orderState==6?'订单异议':'订单关闭'}</Text>
-                                                        <Text style={{marginTop:5,color:"red"}}>{item.capitalState==0?'待支付':item.capitalState==1?'买家已付款':item.capitalState==2?'平台托管':item.capitalState==3?'平台解付中':item.capitalState==4?'卖家已收款':item.capitalState==5?'卖家已退款':item.capitalState==6?'平台托管':item.capitalState==7?'平台解付':'买家已退款'}
+                                                        <Text style={{marginTop:5,color:"red"}}>{this.capitalState[item.capitalState]}
 
                                                             <Text>></Text>
 
@@ -856,7 +1073,13 @@ const RoomInfo2 = props => {
 
 
                                 <View  style={{marginTop:5,flexDirection:"row-reverse"}}>
-                                    <TouchableHighlight underlayColor="transparent" onPress={this.searchOrder} style={{alignItems:"center",justifyContent:"center",marginRight:10}}>
+                                    {this.state.aaa.length>1&&this.state.namee=='finished'?
+                                        <TouchableHighlight underlayColor="transparent" onPress={this.payOrders} style={{alignItems:"center",justifyContent:"center",marginRight:10}}>
+                                            <Text style={{color:"red",fontWeight:"bold",fontSize:16}}>批量支付</Text>
+                                        </TouchableHighlight>:null
+                                    }
+
+                                    <TouchableHighlight underlayColor="transparent" onPress={this.searchOrder} style={{alignItems:"center",justifyContent:"center",marginRight:20}}>
                                         <Image source={search} style={{width:20,height:20}}/>
                                     </TouchableHighlight>
                                 </View>
@@ -876,7 +1099,7 @@ const RoomInfo2 = props => {
                                         renderItem={({item}) => (  //渲染列表的方式
                                             <TouchableHighlight underlayColor="transparent" onPress={()=>{this.details(item)}}>
 
-                                                <View style={[styles.d,styles.e,]}>
+                                                <View style={[styles.d,styles.e,{backgroundColor:item.flag?'#fda095':'#fff'}]}>
 
                                                     <View  style={[{flex:3,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text style={{fontSize:18,fontWeight:"bold"}}>{item.goodsNo}</Text>
@@ -894,20 +1117,20 @@ const RoomInfo2 = props => {
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text style={{color:"grey"}}>总价</Text>
-                                                        <Text  style={{marginTop:5,fontSize:18,color:"orange"}}>{item.goodsAmount}元</Text>
+                                                        <Text  style={{marginTop:5,fontSize:18,color:item.flag?"#000":"orange"}}>{item.goodsAmount.toFixed(2)}元</Text>
                                                     </View>
 
-                                                    <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text>{item.consignee}</Text>
-                                                    </View>
-
-
+                                                    <TouchableHighlight style={[{flex:2,alignItems:"center",justifyContent:"center"}]} underlayColor="transparent" onPress={()=>{this.betchOrder(item,finished,'finished')}}>
+                                                        <View style={[{alignItems:"center",justifyContent:"center"}]}>
+                                                            <Text>{item.consignee}</Text>
+                                                            <Text style={{marginTop:5,color:"red"}}>{item.orderState==1?'批量支付':''}</Text>
+                                                        </View>
+                                                    </TouchableHighlight>
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text>{item.orderState==-1?'删除':item.orderState==1?'买家新建':item.orderState==2?'卖家反馈中':item.orderState==3?'买家撤销':item.orderState==4?'卖家接受':item.orderState==5?'卖家拒绝':item.orderState==6?'订单异议':'订单关闭'}</Text>
-                                                        <Text style={{marginTop:5,color:"red"}}>{item.capitalState==0?'待支付':item.capitalState==1?'买家已付款':item.capitalState==2?'平台托管':item.capitalState==3?'平台解付中':item.capitalState==4?'卖家已收款':item.capitalState==5?'卖家已退款':item.capitalState==6?'平台托管':item.capitalState==7?'平台解付':'买家已退款'}
+                                                        <Text style={{marginTop:5,color:"blue"}}>{this.capitalState[item.capitalState]}
 
                                                             <Text>></Text>
-
                                                         </Text>
 
                                                     </View>
@@ -922,11 +1145,6 @@ const RoomInfo2 = props => {
                                 </View>
                             </View>
                     }
-
-
-
-
-
 
 
                 <View>
@@ -944,19 +1162,12 @@ const RoomInfo2 = props => {
 
                                 <View>
                                     <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
-
-                                        <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看详情'?'查看详情':this.state.modal=='取消订单'?"取消订单":this.state.modal=='退货'?'退货':this.state.modal=='搜索商品'?'查询':'支付'}</Text></View>
-
-
-
+                                        <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>{this.state.modal=='查看详情'?'查看详情':this.state.modal=='取消订单'?"取消订单":this.state.modal=='退货'?'退货':this.state.modal=='搜索商品'?'查询':this.state.modal=='转单'?'重新制单':'支付'}</Text></View>
                                         <TouchableHighlight underlayColor={"#fff"} onPress={this._setModalVisible.bind(this,false) } style={{}}>
                                             <Image style={{height:30,width:30}} source={close}/>
                                         </TouchableHighlight>
 
                                     </View>
-
-
-
 
                                         {
                                             this.state.modal=='查看详情'?
@@ -990,7 +1201,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>订单总金额:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1,color:"orange",fontSize:18,fontWeight:"bold"}}>{details.goodsAmount}元</Text>
+                                                                    <Text style={{flex:1,color:"orange",fontSize:18,fontWeight:"bold"}}>{details.goodsAmount.toFixed(2)}元</Text>
                                                                 </View>
                                                             </View>
 
@@ -1139,26 +1350,26 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>资金状态:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.capitalState==0?'待支付':details.capitalState==1?'买家已付款':details.capitalState==2?'平台托管':details.capitalState==3?'平台解付中':details.capitalState==4?'卖家已收款':details.capitalState==5?'卖家已退款':details.capitalState==6?'平台托管':details.capitalState==7?'平台解付':'买家已退款'}</Text>
+                                                                    <Text style={{flex:1}}>{this.capitalState[details.capitalState]}</Text>
                                                                 </View>
                                                             </View>
 
-                                                            <View style={styles.a}>
-                                                                <Text style={styles.f}>买家备注:</Text>
-                                                                <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.remark}</Text>
-                                                                </View>
-                                                            </View>
-                                                            <View style={styles.a}>
-                                                                <Text style={styles.f}>卖家备注:</Text>
-                                                                <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.orderDesc}</Text>
-                                                                </View>
-                                                            </View>
+                                                            {/*<View style={styles.a}>*/}
+                                                                {/*<Text style={styles.f}>买家备注:</Text>*/}
+                                                                {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                                    {/*<Text style={{flex:1}}>{details.remark}</Text>*/}
+                                                                {/*</View>*/}
+                                                            {/*</View>*/}
+                                                            {/*<View style={styles.a}>*/}
+                                                                {/*<Text style={styles.f}>卖家备注:</Text>*/}
+                                                                {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                                    {/*<Text style={{flex:1}}>{details.orderDesc}</Text>*/}
+                                                                {/*</View>*/}
+                                                            {/*</View>*/}
 
                                                         </ScrollView>
 
-                                                        {details.capitalState==0&&
+                                                        {(details.orderState==1)?
                                                         <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
 
 
@@ -1177,7 +1388,7 @@ const RoomInfo2 = props => {
 
 
 
-                                                        </View>}
+                                                        </View>:null}
 
 
                                                         {details.orderState==2&&
@@ -1186,6 +1397,15 @@ const RoomInfo2 = props => {
                                                             <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
                                                                 <TouchableHighlight onPress={()=>{this.setState({modal:'取消订单',orderState:2,reason:null})}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
                                                                     <Text style={{color:"#fff"}}>撤销订单</Text>
+                                                                </TouchableHighlight>
+                                                            </LinearGradient>
+                                                        </View>}
+                                                        {details.orderState==5&&
+                                                        <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
+
+                                                            <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                <TouchableHighlight onPress={()=>{this.retryOrder()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                    <Text style={{color:"#fff"}}>重新制单</Text>
                                                                 </TouchableHighlight>
                                                             </LinearGradient>
                                                         </View>}
@@ -1202,7 +1422,7 @@ const RoomInfo2 = props => {
 
 
 
-                                                        {(!/6|8|1|-1/.test(details.orderState))&&
+                                                        {((!/6|8|1|-1|3/.test(details.orderState))&&details.postState==1)&&
                                                         <View style={{alignItems:"center",justifyContent:"center",marginTop:20}}>
 
                                                             <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
@@ -1275,8 +1495,7 @@ const RoomInfo2 = props => {
 
 
                                                     </View>
-
-                                                :
+                                                    :
                                                     this.state.modal=='退货'?
                                                         <View style={{padding:10}}>
 
@@ -1466,7 +1685,81 @@ const RoomInfo2 = props => {
 
                                                             </View>
 
-                                                        :<PayComponents _setModalVisible={this._setModalVisible} navigation={this.props.navigation} payDatas={this.state.payDatas} parentId={this.state.details.parentId}/>
+                                                        :this.state.modal=='转单'?
+                                                            <View style={{padding:10}}>
+
+                                                                <View>
+                                                                    <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
+                                                                        <View style={{paddingBottom:this.state.padd}}>
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>渠道:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <Picker
+                                                                                        data={this.state.channelLists}
+                                                                                        cols={1}
+                                                                                        extra={'请选择渠道'}
+                                                                                        value={this.state.channelId}
+                                                                                        onChange={value => {this.setChannel(value)}}
+                                                                                        className="forss">
+                                                                                        <RoomInfo2></RoomInfo2>
+                                                                                    </Picker>
+                                                                                </View>
+                                                                            </View>
+
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>快递:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <Picker
+                                                                                        data={this.state.postList}
+                                                                                        cols={1}
+                                                                                        extra={'请选择快递'}
+                                                                                        value={this.state.postId}
+                                                                                        onChange={value => {this.setPost(value)}}
+                                                                                        className="forss">
+                                                                                        <RoomInfo2></RoomInfo2>
+                                                                                    </Picker>
+                                                                                </View>
+                                                                            </View>
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>数量:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <Text>共:{this.state.stockNum}件</Text>
+                                                                                </View>
+                                                                            </View>
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>单价:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <Text style={{color:"red",fontWeight:"bold"}}>¥{this.state.salePrice&&this.state.salePrice.toFixed(2)}元</Text>
+                                                                                </View>
+                                                                            </View>
+                                                                            <View style={styles.a}>
+                                                                                <Text style={styles.f}>邮费:</Text>
+                                                                                <View style={[styles.b,{flex:3}]}>
+                                                                                    <Text>¥{this.state.postFee}元</Text>
+                                                                                </View>
+                                                                            </View>
+
+                                                                            <View style={{alignItems:"center",justifyContent:"space-around",marginTop:20,flexDirection:"row"}}>
+
+
+                                                                                <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                                                    <TouchableHighlight onPress={this.submitRetryOrder} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                                        <Text style={{color:"#fff"}}>重新制单</Text>
+                                                                                    </TouchableHighlight>
+                                                                                </LinearGradient>
+
+                                                                            </View>
+                                                                        </View>
+
+                                                                    </ScrollView>
+                                                                </View>
+
+                                                            </View>
+
+                                                            :this.state.modal=='制单支付'?
+                                                                <PayComponents _setModalVisible={this._setModalVisible} onRefresh={this.onRefresh} navigation={this.props.navigation} payDatas={this.state.payDatas} orderIds={this.orderIds}/>
+
+                                                                :<PayComponents _setModalVisible={this._setModalVisible} onRefresh={this.onRefresh} navigation={this.props.navigation} payDatas={this.state.payDatas} parentId={this.state.details.parentId}/>
                                         }
 
                                 </View>
@@ -1478,8 +1771,6 @@ const RoomInfo2 = props => {
 
 
                 </View>
-
-
 
             </View>
         )

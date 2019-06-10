@@ -10,6 +10,7 @@ import axios from "../../axios";
 import moment from "moment";
 import LinearGradient from 'react-native-linear-gradient';
 import select from '../select.png'
+import close from "../HomePage/style/close.png";
 
 export default class GoodSelect extends Component {
     constructor(props) {
@@ -33,17 +34,23 @@ export default class GoodSelect extends Component {
             pages2:1,
             aa:false,
             bb:false,
+            detail:{},
             refreshing:false,
             noData1:false,
             noData2:false,
-
+            animationType: 'none',//none slide fade
+            modalVisible: false,//模态场景是否可见
+            transparent: true,//是否透明显示
             message1:"暂无充值记录",
             message2:"暂无提现记录",
         };
 
 
     }
-    
+
+    _setModalVisible = (visible) => {
+        this.setState({ modalVisible: visible });
+    };
 
      handelMsg=(item)=>{
 
@@ -287,10 +294,13 @@ export default class GoodSelect extends Component {
      }
 
 
+     setDetail=(item)=>{
+         this.setState({detail:item,modalVisible:true})
+     }
 
     render(){
 
-        let {refreshing,withdrawalDetail,topUpDetail,handelMsg,changeMsg} = this.state
+        let {refreshing,withdrawalDetail,topUpDetail,handelMsg,changeMsg,detail} = this.state
 
         let modalBackgroundStyle = {
             backgroundColor: this.state.transparent ? 'rgba(0, 0, 0, 0.5)' : 'red',
@@ -326,6 +336,93 @@ export default class GoodSelect extends Component {
                             </LinearGradient>
                         )
                     }
+                </View>
+
+                <View>
+
+                    <Modal
+                        animationType={this.state.animationType}
+                        transparent={this.state.transparent}
+                        visible={this.state.modalVisible}
+
+                        onRequestClose={() => { this._setModalVisible(false) } }
+
+                    >
+                        <View style={[styles.container,modalBackgroundStyle]}>
+                            <View style={[styles.innerContainer,innerContainerTransparentStyle]}>
+
+
+                                <View>
+                                    <View style={{flexDirection:"row",justifyContent:"space-around",alignItems:"center"}}>
+
+                                        <View  style={{flex:1,alignItems:'center'}}><Text style={{fontSize:20}}>查看详情</Text></View>
+
+
+
+                                        <TouchableHighlight underlayColor={"#fff"} onPress={this._setModalVisible.bind(this,false) } style={{}}>
+                                            <Image style={{height:30,width:30}} source={close}/>
+                                        </TouchableHighlight>
+
+                                    </View>
+
+                                    <View>
+                                        <ScrollView style={{maxHeight:Dimensions.get('window').height-200}}>
+                                            <View style={{padding:10}}>
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey"}}>充值交易号:</Text>
+                                                    <Text>{detail.withdrawNo}</Text>
+                                                </View>
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey"}}>申请提现时间:</Text>
+                                                    <Text>{detail.applyTime}</Text>
+                                                </View>
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey"}}>实际到账时间:</Text>
+                                                    <Text>{detail.confirmTime}</Text>
+                                                </View>
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey"}}>提现金额:</Text>
+                                                    <Text style={{fontSize:18,color:"orange",fontWeight:"bold"}}>{detail.amount}元</Text>
+                                                </View>
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey"}}>到账金额:</Text>
+                                                    <Text>{detail.realAmount}元</Text>
+                                                </View>
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey"}}>银行名称:</Text>
+                                                    <Text>{detail.bankName}</Text>
+                                                </View>
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey"}}>银行卡号:</Text>
+                                                    <Text>{detail.bankNo}</Text>
+                                                </View>
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey"}}>账户名称:</Text>
+                                                    <Text>{detail.accountName}</Text>
+                                                </View>
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey"}}>提现标志:</Text>
+                                                    <Text style={{fontSize:18,color:"red",fontWeight:"bold"}}>{detail.flag==1?"申请提现":"确认到账"}</Text>
+                                                </View>
+                                                {detail.image&&
+                                                <View style={{flexDirection:"row",marginTop:10,alignItems:"center"}}>
+                                                    <Text style={{marginRight:10,color:"grey",width:80}}>提现二维码图片:</Text>
+                                                    <View><Image source={{uri:detail.image}} style={{width:200,height:250,resizeMode:'contain'}}/></View>
+                                                </View>}
+                                            </View>
+                                        </ScrollView>
+                                    </View>
+
+
+                                </View>
+
+
+                            </View>
+                        </View>
+                    </Modal>
+
+
+
                 </View>
 
 
@@ -407,39 +504,34 @@ export default class GoodSelect extends Component {
 
                                             <View style={[styles.d,styles.e,]}>
 
-                                                <View style={[{flex:3,alignItems:"center",justifyContent:"center"}]}>
+                                                <View style={[{flex:1,alignItems:"center",justifyContent:"center"}]}>
                                                     <View  style={[{alignItems:"center",justifyContent:"center"}]}>
-                                                        <Text style={{fontSize:18,fontWeight:"bold"}}>{item.withdrawNo}</Text>
                                                         <Text  style={{marginTop:5,}}>{moment(item.applyTime).format('YYYY-MM-DD')}</Text>
-
                                                     </View>
 
                                                 </View>
 
 
-
-                                                <View style={[{flex:3,alignItems:"center",justifyContent:"center"}]}>
-                                                    <Text>{item.alipayNo}</Text>
-                                                    <Text style={{marginTop:5,color:"grey"}}>{item.tradeNo}</Text>
-                                                </View>
-
-
-                                                <View style={[{flex:3,alignItems:"center",justifyContent:"center"}]}>
+                                                <View style={[{flex:1,alignItems:"center",justifyContent:"center"}]}>
                                                     <Text  style={{fontSize:18,color:"orange"}}>提现{item.amount}元</Text>
                                                     {item.realAmount&&<Text  style={{fontSize:18,color:"orange",marginTop:2}}>到账{item.realAmount}元</Text>}
                                                     {item.confirmTime&&<Text  style={{color:"grey",marginTop:2}}>到账时间{item.confirmTime}</Text>}
                                                 </View>
 
 
-                                                <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
+                                                <View style={[{flex:1,alignItems:"center",justifyContent:"center"}]}>
                                                     <Text>{item.bankName}</Text>
                                                     <Text style={{marginTop:5,color:"grey"}}>{item.bankNo}</Text>
                                                 </View>
 
 
-                                                <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
-                                                    <Text>{item.flag==1?'申请提现':'确认到账'}</Text>
-                                                </View>
+                                                <TouchableHighlight underlayColor="transparent" style={[{flex:1}]} onPress={()=>{this.setDetail(item)}}>
+                                                    <View style={[{alignItems:"center",justifyContent:"center"}]}>
+                                                        <Text>{item.flag==1?'申请提现':'确认到账'}</Text>
+                                                        <Text style={{marginTop:5,color:"red"}}>查看详情>></Text>
+                                                    </View>
+                                                </TouchableHighlight>
+
 
 
 

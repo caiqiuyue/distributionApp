@@ -8,7 +8,9 @@ import axios from "../../axios";
 import {Picker,Toast} from "antd-mobile";
 import LinearGradient from 'react-native-linear-gradient';
 import RNFS from 'react-native-fs';
+
 import s1 from "../HomePage/style/234.png";
+import AddPic from "./addPic";
 import bankCardAttribution from "./bank";
 const RoomInfo = props => {
     return (
@@ -31,6 +33,7 @@ export default class Mine extends React.Component {
             name:null,
             cardType:'',
             bankcardNo:'',
+            file:[],
             wayList:[
                 {label:'微信',value:'1'},
                 {label:'支付宝',value:'2'},
@@ -88,17 +91,24 @@ export default class Mine extends React.Component {
     }
 
     comfirmSelected = ()=>{
-        let {amount,name,bankcardNo,cardType,way} = this.state
+        let {amount,name,bankcardNo,cardType,way,file} = this.state
+
+        let data=new FormData();
+        let aa = {
+            amount,
+            accountName:name,
+            bankName:cardType,
+            bankNo:way[0]==3?bankcardNo:bankcardNo.replace(/\s+/g,"")
+        }
+        data.append('data',JSON.stringify(aa))
 
 
-        axios.post(`/account/applyWithdraw`,{
-                amount,
-                accountName:name,
-                bankName:cardType,
-                bankNo:way[0]==3?bankcardNo:bankcardNo.replace(/\s+/g,"")
+        this.state.file && this.state.file.map(item=>{
+            data.append('file',item)
+        })
 
 
-            },
+        axios.post(`/account/applyWithdraw`,data,
         )
             .then((response) =>{
                 console.log(response);
@@ -138,7 +148,7 @@ export default class Mine extends React.Component {
 
     }
     submit = ()=>{
-        let {way,amount,name,bankcardNo,cardType,data} = this.state
+        let {file,way,amount,name,bankcardNo,cardType,data} = this.state
         
         console.log(bankcardNo,'bankcardNo');
 
@@ -172,6 +182,11 @@ export default class Mine extends React.Component {
             return
         }
 
+        if(file.length==0 && way[0]==1){
+            Toast.info('请上传微信收款码',1)
+            return
+        }
+
 
 
 
@@ -186,6 +201,12 @@ export default class Mine extends React.Component {
     }
 
 
+    addPic = (item)=>{
+        console.log(item,'addPicaddPicaddPicaddPic');
+        this.setState({
+            file:item
+        })
+    }
 
 
     bankNumRep = (item) => {
@@ -300,6 +321,7 @@ export default class Mine extends React.Component {
                                         </TextInput>
                                     </View>
                                 </View>
+                                <AddPic  addPic={this.addPic}/>
                             </View>:
                             <View>
                                 <View style={styles.a}>

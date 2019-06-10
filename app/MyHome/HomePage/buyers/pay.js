@@ -596,7 +596,7 @@ export default class App extends React.Component {
 
 
         let data = {
-            totalMoney:(totalMoney-0),
+            totalMoney:(totalMoney-0).toFixed(2),
             custOrderNo,postFlag:postFlag[0]-0,remark,
             address:{
                 address,
@@ -620,7 +620,7 @@ export default class App extends React.Component {
                 a.modelId = item.modelId
                 a.goodsNum = item.stockNo
                 a.goodsPrice = (item.salePrice-0)
-                a.goodsAmount = ((item.salePrice-0)*(item.stockNo-0))+(item.postFee-0)+((_item.authenticateFee-0)*(item.stockNo-0))
+                a.goodsAmount = (((item.salePrice-0)*(item.stockNo-0))+(item.postFee-0)+((_item.authenticateFee-0)*(item.stockNo-0))).toFixed(2)
                 a.channelId = _item.channelId
                 a.authenticateFee = _item.authenticateFee * item.stockNo
                 a.goodsId = _item.goodsId
@@ -1022,7 +1022,7 @@ export default class App extends React.Component {
                                                 <View style={{flexDirection:"row",marginTop:10,justifyContent:"space-between"}}>
                                                     <View style={styles.qw}><Text>{item.modelName}码</Text></View>
                                                     <View style={styles.qw}><Text><Text style={{color:"grey"}}>数量</Text>*{item.stockNo}</Text></View>
-                                                    <View style={styles.qw}><Text><Text style={{color:"grey"}}>单价:</Text>{item.salePrice}元</Text></View>
+                                                    <View style={styles.qw}><Text><Text style={{color:"grey"}}>单价:</Text>{item.salePrice&&item.salePrice.toFixed(2)}元</Text></View>
                                                     <View style={styles.qw}><Text style={{fontWeight:"bold"}}>{(item.salePrice-0)*(item.stockNo-0)}元</Text></View>
                                                 </View>
                                                 <DashLine/>

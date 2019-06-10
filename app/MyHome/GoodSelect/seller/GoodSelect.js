@@ -881,7 +881,7 @@ const RoomInfo2 = props => {
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text style={{color:"grey"}}>总价</Text>
-                                                        <Text  style={{marginTop:5,fontSize:18,color:"orange"}}>{item.goodsAmount}元</Text>
+                                                        <Text  style={{marginTop:5,fontSize:18,color:"orange"}}>{item.goodsAmount.toFixed(2)}元</Text>
                                                     </View>
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
@@ -960,7 +960,7 @@ const RoomInfo2 = props => {
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text style={{color:"grey"}}>总价</Text>
-                                                        <Text  style={{marginTop:5,fontSize:18,color:"orange"}}>{item.goodsAmount}元</Text>
+                                                        <Text  style={{marginTop:5,fontSize:18,color:"orange"}}>{item.goodsAmount.toFixed(2)}元</Text>
                                                     </View>
 
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
@@ -1058,7 +1058,7 @@ const RoomInfo2 = props => {
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>订单总金额:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1,color:"orange",fontSize:18,fontWeight:"bold"}}>{details.goodsAmount}元</Text>
+                                                                    <Text style={{flex:1,color:"orange",fontSize:18,fontWeight:"bold"}}>{details.goodsAmount.toFixed(2)}元</Text>
                                                                 </View>
                                                             </View>
 
@@ -1209,18 +1209,19 @@ const RoomInfo2 = props => {
                                                                     <Text style={{flex:1}}>{details.capitalState==0?'待支付':details.capitalState==1?'买家已付款':details.capitalState==2?'平台托管':details.capitalState==3?'平台解付中':details.capitalState==4?'卖家已收款':details.capitalState==5?'卖家已退款':details.capitalState==6?'平台托管':details.capitalState==7?'平台解付':'买家已退款'}</Text>
                                                                 </View>
                                                             </View>
-                                                            <View style={styles.a}>
-                                                                <Text style={styles.f}>买家备注:</Text>
-                                                                <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.remark}</Text>
-                                                                </View>
-                                                            </View>
-                                                            <View style={styles.a}>
-                                                                <Text style={styles.f}>卖家备注:</Text>
-                                                                <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.orderDesc}</Text>
-                                                                </View>
-                                                            </View>
+                                                            {/*<View style={styles.a}>*/}
+                                                                {/*<Text style={styles.f}>买家备注:</Text>*/}
+                                                                {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                                    {/*<Text style={{flex:1}}>{details.remark}</Text>*/}
+                                                                {/*</View>*/}
+                                                            {/*</View>*/}
+                                                            {/*<View style={styles.a}>*/}
+                                                                {/*<Text style={styles.f}>卖家备注:</Text>*/}
+                                                                {/*<View style={[styles.b,{flex:3}]}>*/}
+                                                                    {/*<T
+                                                                    ext style={{flex:1}}>{details.orderDesc}</Text>*/}
+                                                                {/*</View>*/}
+                                                            {/*</View>*/}
                                                         </ScrollView>
 
                                                         {details.capitalState==1&&

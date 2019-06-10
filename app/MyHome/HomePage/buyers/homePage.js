@@ -1016,7 +1016,7 @@ export default class App extends React.Component {
                                         <Text>{`${item.brandName} ${item.goodsNo}`}</Text>
                                         <Text style={{marginTop:10}}>{`库存日期: ${item.stockTime}`}</Text>
                                         <View style={{flexDirection:"row",marginTop:10}}>
-                                            {/*<View style={styles.qw}><Text style={{color:"#f94939"}}>{item.feedbackTime>24?`${item.feedbackTime}小时`:'当天'}反馈</Text></View>*/}
+                                            <View style={styles.qw}><Text style={{color:"#f94939"}}>{item.isBack==1?`支持退换`:'不支持退换'}</Text></View>
                                             <View style={styles.qw}><Text style={{color:"#f94939"}}>配货率{item.goodsRate}%</Text></View>
                                             <View style={styles.qw}><Text style={{color:"#f94939"}}>{item.sendTime}天发货</Text></View>
                                         </View>

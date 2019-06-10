@@ -19,7 +19,7 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import select from '../../select.png'
 
-
+import AddMsg from '../addMsg'
  class GoodSelect extends Component {
     constructor(props) {
         super(props);
@@ -494,6 +494,40 @@ import select from '../../select.png'
          })
      }
 
+     comfirmSelected = ()=>{
+         this.setState({
+             modalVisible:false
+         },()=>{
+             axios.get(`/order/finishOrderServer`,{
+                 serviceId:this.state.details.serviceId,
+             },)
+                 .then((response) =>{
+                     console.log(response);
+
+                     this.onRefresh()
+
+                     Toast.info(response.data.code==0?'操作成功':response.data.message,1)
+                 })
+                 .catch(function (error) {
+                     console.log(error);
+                 })
+         })
+     }
+     cancelSelected = ()=>{
+
+     }
+
+     finishOrder=(item)=>{
+
+         Alert.alert(`${item?"退款":"退货退款"}`,`确定${item?"退款":"退货退款"}吗？`,
+             [
+                 {text:"取消", onPress:this.cancelSelected},
+                 {text:"确认", onPress:this.comfirmSelected}
+             ],
+             { cancelable: false }
+         );
+
+     }
 
      focus=()=>{
 
@@ -726,7 +760,7 @@ import select from '../../select.png'
                                                             <View style={styles.a}>
                                                                 <Text style={styles.f}>服务状态:</Text>
                                                                 <View style={[styles.b,{flex:3}]}>
-                                                                    <Text style={{flex:1}}>{details.serviceStatus==0?"未受理": details.serviceStatus==1?"受理中":"已受理"}</Text>
+                                                                    <Text style={{flex:1}}>{details.serviceStatus==0?"未受理": details.serviceStatus==1?"受理中":details.serviceStatus==2?"已受理":details.serviceStatus==4?"工单关闭":"平台接管"}</Text>
                                                                 </View>
                                                             </View>
 
@@ -802,6 +836,41 @@ import select from '../../select.png'
 
 
                                                     </View>}
+
+                                                    {
+                                                        (details.processResult==1&&details.serviceStatus!=2&&details.serviceStatus!=4&&details.processType==1)&&
+                                                    <View style={{alignItems:"center",justifyContent:"center",marginTop:20,flexDirection:"row"}}>
+
+                                                        <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                            <TouchableHighlight onPress={()=>{this.finishOrder()}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                <Text style={{color:"#fff"}}>退货退款</Text>
+                                                            </TouchableHighlight>
+                                                        </LinearGradient>
+
+
+                                                    </View>}
+
+                                                    {
+                                                        (details.processResult==1&&details.processType==2&&details.serviceStatus!=2&&details.serviceStatus!=4)&&
+                                                    <View style={{alignItems:"center",justifyContent:"center",marginTop:20,flexDirection:"row"}}>
+
+                                                        <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                            <TouchableHighlight onPress={()=>{this.finishOrder(true)}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                <Text style={{color:"#fff"}}>仅退款</Text>
+                                                            </TouchableHighlight>
+                                                        </LinearGradient>
+
+
+                                                    </View>}
+
+                                                    <View style={{alignItems:"center",justifyContent:"center",marginTop:20,flexDirection:"row"}}>
+
+                                                        <LinearGradient colors={['#f96f59', '#f94939']} style={{borderRadius:5,alignItems:"center",justifyContent:"center",width:100}}>
+                                                            <TouchableHighlight onPress={()=>{this.setState({modal:'留言'})}} underlayColor="transparent" style={{padding:10,alignItems:"center",justifyContent:"center",}}>
+                                                                <Text style={{color:"#fff"}}>留言</Text>
+                                                            </TouchableHighlight>
+                                                        </LinearGradient>
+                                                    </View>
 
 
                                                 </View>:
@@ -927,7 +996,10 @@ import select from '../../select.png'
 
 
 
-                                                    :<View/>
+                                                    :this.state.modal=='留言'?
+                                                    <AddMsg serviceId={details.serviceId}/>
+                                                    :
+                                                    <View/>
                                         }
 
                                     </View>
@@ -1000,7 +1072,7 @@ import select from '../../select.png'
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text>{item.problemType==1?'无理由退货':item.problemType==2?'实物不符':item.problemType==3?'货物破损':item.problemType==4?'拒收快递':item.problemType==5?'未按时发货':item.problemType==6?'未收到货':item.problemType==7?'少件漏件':'邮费异差'}</Text>
 
-                                                        <Text style={{marginTop:5,color:"red"}}>{item.serviceStatus==0?"未受理": item.serviceStatus==1?"受理中":"已受理"}></Text>
+                                                        <Text style={{marginTop:5,color:"red"}}>{item.serviceStatus==0?"未受理": item.serviceStatus==1?"受理中":item.serviceStatus==2?"已受理":item.serviceStatus==4?"工单关闭":"平台接管"}></Text>
 
                                                     </View>
 
@@ -1066,7 +1138,7 @@ import select from '../../select.png'
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text>{item.problemType==1?'无理由退货':item.problemType==2?'实物不符':item.problemType==3?'货物破损':item.problemType==4?'拒收快递':item.problemType==5?'未按时发货':item.problemType==6?'未收到货':item.problemType==7?'少件漏件':'邮费异差'}</Text>
 
-                                                        <Text style={{marginTop:5,color:"red"}}>{item.serviceStatus==0?"未受理": item.serviceStatus==1?"受理中":"已受理"}></Text>
+                                                        <Text style={{marginTop:5,color:"red"}}>{item.serviceStatus==0?"未受理": item.serviceStatus==1?"受理中":item.serviceStatus==2?"已受理":item.serviceStatus==4?"工单关闭":"平台接管"}></Text>
 
                                                     </View>
 
@@ -1131,7 +1203,7 @@ import select from '../../select.png'
                                                     <View style={[{flex:2,alignItems:"center",justifyContent:"center"}]}>
                                                         <Text>{item.problemType==1?'无理由退货':item.problemType==2?'实物不符':item.problemType==3?'货物破损':item.problemType==4?'拒收快递':item.problemType==5?'未按时发货':item.problemType==6?'未收到货':item.problemType==7?'少件漏件':'邮费异差'}</Text>
 
-                                                        <Text style={{marginTop:5,color:"red"}}>{item.serviceStatus==0?"未受理": item.serviceStatus==1?"受理中":"已受理"}></Text>
+                                                        <Text style={{marginTop:5,color:"red"}}>{item.serviceStatus==0?"未受理": item.serviceStatus==1?"受理中":item.serviceStatus==2?"已受理":item.serviceStatus==4?"工单关闭":"平台接管"}></Text>
 
                                                     </View>
 

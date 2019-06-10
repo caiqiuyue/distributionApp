@@ -33,6 +33,7 @@ export default class App extends React.Component {
 
 
         this.parentId = null
+        this.orderIds = null
 
     }
 
@@ -43,11 +44,11 @@ export default class App extends React.Component {
             payDatas:this.props.payDatas
         })
 
-        this.parentId = this.props.parentId
-
-
-        console.log(this.props);
-
+        if(this.props.parentId){
+            this.parentId = this.props.parentId
+        }else {
+            this.orderIds = this.props.orderIds
+        }
 
 
     }
@@ -78,21 +79,27 @@ export default class App extends React.Component {
 
 
         let data = {
-            parentId:this.parentId,
             payMoney:this.state.payDatas.payMoney,
             password:payPassword,
             skip_verify:"46396EF464AA44EFB155740B804ADBF2"
         }
-        
+        if(this.props.parentId){
+            data.parentId=this.parentId
+        }else {
+            let orderIds = JSON.parse(JSON.stringify(this.orderIds+''))
+            data.orderIds=orderIds.split(',')
+        }
         console.log(data);
 
 
+        let url = `/order/${this.props.parentId?'orderPay':'orderBatchPay'}`
 
-        axios.post(`/order/orderPay`,data,)
+        axios.post(`${url}`,data,)
             .then((res) =>{
                 console.log(res);
                 if(res.data.code==0){
                     this.props._setModalVisible(false)
+                    this.props.onRefresh()
                     const { navigate } = this.props.navigation;
                     navigate('GoodSelect',{ user: '' });
 
@@ -227,6 +234,28 @@ export default class App extends React.Component {
                             </LinearGradient>
                         </View>
 
+                        <View style={{borderLeftWidth:3,borderLeftColor:'#f96f59',marginTop:10,marginBottom:10}}>
+                            <Text style={{fontSize:20,fontWeight:'bold',paddingLeft:10}}>订单详情</Text>
+                        </View>
+                        {
+                            payDatas.orderList.map((item,index)=>
+
+                                <View style={{flexDirection:"row",padding:5,borderBottomWidth:1,borderBottomColor:"#ccc"}} key={index}>
+                                    <View style={{flex:2,alignItems:"center",justifyContent:"center"}}>
+                                        <Text style={{fontSize:16,fontWeight:"bold"}}>{item.goodsNo}</Text>
+                                        <Text style={{marginTop:5,color:"grey"}}>品牌:{item.brandName}</Text>
+                                        <Text style={{marginTop:5,color:"grey"}}>渠道:{item.channelName}</Text>
+                                    </View>
+                                    <View style={{flex:1,alignItems:"center",justifyContent:"center"}}>
+                                        <Text style={{fontSize:16,fontWeight:"bold"}}>*{item.goodsNum}件</Text>
+                                    </View>
+                                    <View style={{flex:2,alignItems:"center",justifyContent:"center"}}>
+                                        <Text>单价:¥{item.goodsPrice}元</Text>
+                                        <Text style={{marginTop:5}}>邮费:¥{item.postFee}元</Text>
+                                    </View>
+                                </View>
+                            )
+                        }
 
 
                     </ScrollView>
