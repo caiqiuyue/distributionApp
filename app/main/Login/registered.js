@@ -193,7 +193,7 @@ export default class Login extends Component {
         });
     }
 
-    
+
 
     //密码输入
     handlePasswordChange = (value) => {
@@ -204,7 +204,7 @@ export default class Login extends Component {
         });
     }
 
-   
+
 
     //提交
     handleSubmit = () => {
@@ -532,24 +532,24 @@ export default class Login extends Component {
 
 
                                             {/*<View style={{marginTop:10,flexDirection:"row"}}>*/}
-                                                {/*<View style={{flex:3,flexDirection:"row",padding:5,borderBottomColor:"#d49a98",borderBottomWidth:2}}>*/}
-                                                    {/*<View style={{justifyContent:'center',}}><Image source={yzm} style={styles.iconImg}/></View>*/}
-                                                    {/*<View style={{justifyContent:'center',marginLeft:10,flex:1}}>*/}
-                                                        {/*<TextInput*/}
-                                                            {/*placeholder="请输入验证码"*/}
-                                                            {/*style={{minWidth:100,padding:5}}*/}
-                                                            {/*underlineColorAndroid="transparent"*/}
-                                                            {/*autoCapitalize={'none'}*/}
-                                                            {/*onFocus={this.focus}*/}
-                                                            {/*onChangeText={(code) => this.setState({code})}*/}
-                                                        {/*>*/}
-                                                        {/*</TextInput>*/}
-                                                    {/*</View>*/}
-                                                {/*</View>*/}
+                                            {/*<View style={{flex:3,flexDirection:"row",padding:5,borderBottomColor:"#d49a98",borderBottomWidth:2}}>*/}
+                                            {/*<View style={{justifyContent:'center',}}><Image source={yzm} style={styles.iconImg}/></View>*/}
+                                            {/*<View style={{justifyContent:'center',marginLeft:10,flex:1}}>*/}
+                                            {/*<TextInput*/}
+                                            {/*placeholder="请输入验证码"*/}
+                                            {/*style={{minWidth:100,padding:5}}*/}
+                                            {/*underlineColorAndroid="transparent"*/}
+                                            {/*autoCapitalize={'none'}*/}
+                                            {/*onFocus={this.focus}*/}
+                                            {/*onChangeText={(code) => this.setState({code})}*/}
+                                            {/*>*/}
+                                            {/*</TextInput>*/}
+                                            {/*</View>*/}
+                                            {/*</View>*/}
 
-                                                {/*<TouchableHighlight style={{justifyContent:'center',flex:2,}} underlayColor="transparent" onPress={this.changeCode}>*/}
-                                                    {/*<Image style={{resizeMode:"stretch",width:'100%',height:30}} source={{uri:codeData.image}}/>*/}
-                                                {/*</TouchableHighlight>*/}
+                                            {/*<TouchableHighlight style={{justifyContent:'center',flex:2,}} underlayColor="transparent" onPress={this.changeCode}>*/}
+                                            {/*<Image style={{resizeMode:"stretch",width:'100%',height:30}} source={{uri:codeData.image}}/>*/}
+                                            {/*</TouchableHighlight>*/}
                                             {/*</View>*/}
 
 
